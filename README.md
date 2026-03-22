@@ -62,8 +62,13 @@ The backend is built in **Python/Flask**, the frontend uses HTML/CSS/JS, and dat
 - Instructor can build & run with **no manual setup**
 
 ---
+<<<<<<< HEAD
 <!--
 ## ⚙️ Environment Variables (`.env`)
+=======
+
+<!-- ## ⚙️ Environment Variables (`.env`)
+>>>>>>> c8c51f1 (changed model for chatbot)
 
 Create a `.env` file:
 
@@ -74,8 +79,13 @@ STRIPE_PUBLIC_KEY=pk_test_51SRCVt0RNCB3m8QSpZhxFBpOZr8mMSpIO8MO43DcfLXX1AArhDGLl
 SQLALCHEMY_DATABASE_URI=sqlite:///db.sqlite3
 ```
 
+<<<<<<< HEAD
 ---
 -->
+=======
+--- -->
+
+>>>>>>> c8c51f1 (changed model for chatbot)
 ## ▶️ Running the App Locally
 
 ### 1. Install dependencies

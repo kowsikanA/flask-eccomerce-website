@@ -22,26 +22,37 @@ def register():
         return jsonify({"error": "Email and password required for registration"}), 400
 
     if not security_question or not security_answer:
-        return jsonify({"error": "security question and answer are required"}), 400
+        return jsonify({"error": "Security question and answer are required"}), 400
 
+    # ✅ Check email exists
     if User.query.filter_by(email=email).first():
         return jsonify({"error": "Email already exists"}), 409
 
-    new_user = User(email=email, phone_number=phone_number)
-    new_user.set_password(password)
-    new_user.security_question = security_question
-    new_user.set_security_answer(security_answer)
+    # ✅ FIX: Check phone number exists
+    if phone_number:
+        existing_phone = User.query.filter_by(phone_number=phone_number).first()
+        if existing_phone:
+            return jsonify({"error": "Phone number already exists"}), 409
 
-    db.session.add(new_user)
-    db.session.commit()
+    try:
+        new_user = User(email=email, phone_number=phone_number)
+        new_user.set_password(password)
+        new_user.security_question = security_question
+        new_user.set_security_answer(security_answer)
 
-    return jsonify(
-        {
+        db.session.add(new_user)
+        db.session.commit()
+
+        return jsonify({
             "id": new_user.id,
             "email": new_user.email,
             "phone_number": new_user.phone_number,
-        }
-    ), 201
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print("Register error:", e)
+        return jsonify({"error": "Something went wrong during registration"}), 500
 
 
 @auth_bp.route("/login", methods=["POST"])

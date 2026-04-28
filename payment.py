@@ -4,6 +4,7 @@ from extensions import db
 from models import User, CartItem, Product, Order, OrderItem
 import stripe
 import os
+BASE_URL = os.getenv("BASE_URL")
 
 payment_bp = Blueprint("payments", __name__)
 
@@ -76,8 +77,8 @@ def create_checkout_session():
             payment_method_types=["card"],
             line_items=line_items,
             mode="payment",
-            success_url=f"http://localhost:5000/order/confirmed?order_id={order.id}",
-            cancel_url=f"http://localhost:5000/order/failed?order_id={order.id}",
+success_url=f"{BASE_URL}/order/confirmed?order_id={order.id}",
+cancel_url=f"{BASE_URL}/order/failed?order_id={order.id}",
             metadata={
                 "order_id": str(order.id),
                 "user_id": str(user.id),

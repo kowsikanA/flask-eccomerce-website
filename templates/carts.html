@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link rel="stylesheet" href="{{ url_for('static', filename='style/carts.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -40,9 +41,22 @@
           </form>
         </li>
 
-        <li class="link">
+        <li class="link user-menu">
           <a href="{{ url_for('login') }}" id="auth-link">Sign In</a>
+
+          <!-- 🔽 USER DROPDOWN -->
+          <div id="user-dropdown" class="user-dropdown hidden">
+            <div class="user-info">
+              <div id="dropdown-avatar" class="dropdown-avatar"></div>
+              <p id="dropdown-email"></p>
+            </div>
+
+            <button id="account-btn" class="account-btn">Account Details</button>
+            <button id="logout-btn" class="logout-btn">Sign Out</button>  
+
+            </div>
         </li>
+
 
         <li class="link">
           <a href="{{ url_for('carts') }}">
@@ -191,42 +205,102 @@
     </div>
   </footer>
 
+  <!-- Login / logout helper -->
   <script>
-    (function () {
-      const FLAG_KEY = "ns_initial_logout_done";
+function handleLogout() {
+  localStorage.removeItem("access_token");
+  window.location.href = "/login";
+}
 
-      if (!sessionStorage.getItem(FLAG_KEY)) {
-        localStorage.removeItem("access_token");
-        sessionStorage.setItem(FLAG_KEY, "1");
-      }
-    })();
+function getUserData(token) {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const email = payload.sub || payload.identity || "";
+    return {
+      email,
+      initial: email.charAt(0).toUpperCase() || "U"
+    };
+  } catch {
+    return { email: "User", initial: "U" };
+  }
+}
 
-    function handleLogout(event) {
-      event.preventDefault();
-      localStorage.removeItem("access_token");
-      window.location.href = "{{ url_for('login') }}";
-    }
+function getAvatarColor(letter) {
+  const colors = [
+    "#2BD1F0",
+    "#4F46E5",
+    "#16A34A",
+    "#F97316",
+    "#9333EA",
+    "#DC2626",
+    "#0284C7"
+  ];
+  return colors[letter.charCodeAt(0) % colors.length];
+}
 
-    function updateAuthLink() {
-      const authLink = document.getElementById("auth-link");
-      if (!authLink) return;
+function updateAuthUI() {
+  const authLink = document.getElementById("auth-link");
+  const dropdown = document.getElementById("user-dropdown");
+  const dropdownAvatar = document.getElementById("dropdown-avatar");
+  const dropdownEmail = document.getElementById("dropdown-email");
 
-      const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem("access_token");
 
-      if (token) {
-        authLink.textContent = "Sign Out";
-        authLink.href = "#";
-        authLink.onclick = handleLogout;
-      } else {
-        authLink.textContent = "Sign In";
-        authLink.href = "{{ url_for('login') }}";
-        authLink.onclick = null;
-      }
-    }
+  if (!token) {
+    authLink.textContent = "Sign In";
+    authLink.href = "/login";
+    authLink.classList.remove("user-avatar");
+    dropdown.classList.add("hidden");
+    return;
+  }
 
-    document.addEventListener("DOMContentLoaded", updateAuthLink);
-  </script>
+  const user = getUserData(token);
 
+  // avatar circle
+  authLink.textContent = user.initial;
+  authLink.href = "#";
+  authLink.classList.add("user-avatar");
+  authLink.style.backgroundColor = getAvatarColor(user.initial);
+
+  // dropdown info
+  dropdownAvatar.textContent = user.initial;
+  dropdownAvatar.style.backgroundColor = getAvatarColor(user.initial);
+  dropdownEmail.textContent = user.email;
+
+  // toggle dropdown
+  authLink.onclick = (e) => {
+    e.preventDefault();
+    dropdown.classList.toggle("hidden");
+  };
+}
+
+// logout click
+document.addEventListener("click", (e) => {
+  if (e.target.id === "logout-btn") {
+    handleLogout();
+  }
+});
+
+document.addEventListener("click", (e) => {
+  if (e.target.id === "account-btn") {
+    window.location.href = "/account";
+  }
+});
+
+// click outside closes dropdown
+document.addEventListener("click", (e) => {
+  const dropdown = document.getElementById("user-dropdown");
+  const authLink = document.getElementById("auth-link");
+
+  if (!dropdown || !authLink) return;
+
+  if (!authLink.contains(e.target) && !dropdown.contains(e.target)) {
+    dropdown.classList.add("hidden");
+  }
+});
+
+document.addEventListener("DOMContentLoaded", updateAuthUI);
+</script>
   <script>
     const chatWidget = document.getElementById("chat-widget");
     const chatToggle = document.getElementById("chat-toggle");

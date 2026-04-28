@@ -1,0 +1,165 @@
+.account-section {
+  min-height: 90vh;
+  background: #f4f8fb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 50px 18px;
+}
+
+.account-card {
+  width: 100%;
+  max-width: 720px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 26px;
+  padding: 34px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+}
+
+.account-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 24px;
+}
+
+.account-avatar {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  color: white;
+  font-size: 30px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.account-badge {
+  display: inline-block;
+  color: #0284c7;
+  font-size: 13px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.account-header h1 {
+  color: #0f172a;
+  font-size: 28px;
+  word-break: break-word;
+}
+
+.account-header p {
+  color: #64748b;
+  margin-top: 6px;
+}
+
+.account-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.info-row {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+}
+
+.info-row span {
+  color: #0f172a;
+  font-weight: 900;
+}
+
+.info-row span i {
+  color: #0284c7;
+  margin-right: 8px;
+}
+
+.info-row p {
+  color: #475569;
+  font-weight: 700;
+  text-align: right;
+  word-break: break-word;
+}
+
+.status-pill {
+  color: #166534 !important;
+  background: #dcfce7;
+  border: 1px solid #22c55e;
+  border-radius: 999px;
+  padding: 6px 12px;
+}
+
+.account-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+.secondary-btn,
+.logout-btn {
+  flex: 1;
+  padding: 13px 18px;
+  border-radius: 999px;
+  font-weight: 900;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  border: none;
+  transition: 0.2s ease;
+}
+
+.secondary-btn {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+.secondary-btn:hover {
+  background: #38bdf8;
+  color: #082f49;
+}
+
+.logout-btn {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.logout-btn:hover {
+  background: #ef4444;
+  color: white;
+}
+
+@media (max-width: 650px) {
+  .account-card {
+    padding: 26px 20px;
+  }
+
+  .account-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .info-row p {
+    text-align: left;
+  }
+
+  .account-actions {
+    flex-direction: column;
+  }
+}

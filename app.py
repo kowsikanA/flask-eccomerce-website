@@ -50,6 +50,10 @@ def create_app():
     @app.route("/")
     def home():
         return render_template("index.html")
+    
+    @app.route("/account")
+    def account():
+        return render_template("account.html")
 
     @app.route("/login")
     def login():

@@ -21,35 +21,38 @@
   </head>
 
   <body>
-    <!-- Navbar -->
     <div class="main-navbar">
       <div class="navbar">
         <a href="{{ url_for('home') }}">
-          <img
-            src="{{ url_for('static', filename='images/logo-2.png') }}"
-            alt="NorthStar Goods logo"
-            class="logo"
-          >
+          <img src="{{ url_for('static', filename='images/logo-2.png') }}" alt="NorthStar Goods logo" class="logo">
         </a>
 
         <ul class="nav-links">
           <li class="search-bar">
             <form action="{{ url_for('search') }}" method="GET">
-              <input
-                type="search"
-                name="query"
-                id="nav-search-input"
-                placeholder="Search NorthStar Goods"
-              >
+              <input type="search" name="query" id="nav-search-input" placeholder="Search NorthStar Goods">
               <button class="search-btn" type="submit">
                 <i class="fa fa-search"></i>
               </button>
             </form>
           </li>
 
-          <li class="link">
-            <a href="{{ url_for('login') }}" id="auth-link">Sign In</a>
-          </li>
+          <li class="link user-menu">
+          <a href="{{ url_for('login') }}" id="auth-link">Sign In</a>
+
+          <!-- 🔽 USER DROPDOWN -->
+          <div id="user-dropdown" class="user-dropdown hidden">
+            <div class="user-info">
+              <div id="dropdown-avatar" class="dropdown-avatar"></div>
+              <p id="dropdown-email"></p>
+            </div>
+
+            <button id="account-btn" class="account-btn">Account Details</button>
+            <button id="logout-btn" class="logout-btn">Sign Out</button>  
+
+            </div>
+        </li>
+
 
           <li class="link">
             <a href="{{ url_for('carts') }}" aria-label="Cart">
@@ -143,15 +146,10 @@
       </section>
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
       <div class="footer-container">
         <div class="footer-section">
-          <img
-            src="{{ url_for('static', filename='images/logo-2.png') }}"
-            class="footer-logo"
-            alt="NorthStar Goods"
-          >
+          <img src="{{ url_for('static', filename='images/logo-2.png') }}" class="footer-logo" alt="NorthStar Goods">
           <p>Your trusted online store for tech, lifestyle, groceries, home, fashion, and more.</p>
         </div>
 
@@ -190,33 +188,102 @@
       </div>
     </footer>
 
-    <script>
-      function handleLogout(event) {
-        event.preventDefault();
-        localStorage.removeItem("access_token");
-        window.location.href = "{{ url_for('login') }}";
-      }
+    <!-- Login / logout helper -->
+  <script>
+function handleLogout() {
+  localStorage.removeItem("access_token");
+  window.location.href = "/login";
+}
 
-      function updateAuthLink() {
-        const authLink = document.getElementById("auth-link");
-        if (!authLink) return;
+function getUserData(token) {
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const email = payload.sub || payload.identity || "";
+    return {
+      email,
+      initial: email.charAt(0).toUpperCase() || "U"
+    };
+  } catch {
+    return { email: "User", initial: "U" };
+  }
+}
 
-        const token = localStorage.getItem("access_token");
+function getAvatarColor(letter) {
+  const colors = [
+    "#2BD1F0",
+    "#4F46E5",
+    "#16A34A",
+    "#F97316",
+    "#9333EA",
+    "#DC2626",
+    "#0284C7"
+  ];
+  return colors[letter.charCodeAt(0) % colors.length];
+}
 
-        if (token) {
-          authLink.textContent = "Sign Out";
-          authLink.href = "#";
-          authLink.onclick = handleLogout;
-        } else {
-          authLink.textContent = "Sign In";
-          authLink.href = "{{ url_for('login') }}";
-          authLink.onclick = null;
-        }
-      }
+function updateAuthUI() {
+  const authLink = document.getElementById("auth-link");
+  const dropdown = document.getElementById("user-dropdown");
+  const dropdownAvatar = document.getElementById("dropdown-avatar");
+  const dropdownEmail = document.getElementById("dropdown-email");
 
-      document.addEventListener("DOMContentLoaded", updateAuthLink);
-    </script>
+  const token = localStorage.getItem("access_token");
 
+  if (!token) {
+    authLink.textContent = "Sign In";
+    authLink.href = "/login";
+    authLink.classList.remove("user-avatar");
+    dropdown.classList.add("hidden");
+    return;
+  }
+
+  const user = getUserData(token);
+
+  // avatar circle
+  authLink.textContent = user.initial;
+  authLink.href = "#";
+  authLink.classList.add("user-avatar");
+  authLink.style.backgroundColor = getAvatarColor(user.initial);
+
+  // dropdown info
+  dropdownAvatar.textContent = user.initial;
+  dropdownAvatar.style.backgroundColor = getAvatarColor(user.initial);
+  dropdownEmail.textContent = user.email;
+
+  // toggle dropdown
+  authLink.onclick = (e) => {
+    e.preventDefault();
+    dropdown.classList.toggle("hidden");
+  };
+}
+
+// logout click
+document.addEventListener("click", (e) => {
+  if (e.target.id === "logout-btn") {
+    handleLogout();
+  }
+});
+
+document.addEventListener("click", (e) => {
+  if (e.target.id === "account-btn") {
+    window.location.href = "/account";
+  }
+});
+
+// click outside closes dropdown
+document.addEventListener("click", (e) => {
+  const dropdown = document.getElementById("user-dropdown");
+  const authLink = document.getElementById("auth-link");
+
+  if (!dropdown || !authLink) return;
+
+  if (!authLink.contains(e.target) && !dropdown.contains(e.target)) {
+    dropdown.classList.add("hidden");
+  }
+});
+
+document.addEventListener("DOMContentLoaded", updateAuthUI);
+</script>
     <script>
       const form = document.getElementById("search-form");
       const input = document.getElementById("search-input");
@@ -370,7 +437,9 @@
 
                 <div class="product-bottom">
                   <p class="product-price">$${product.price}</p>
-                  <button type="button" class="quick-view-btn">View Item</button>
+                  <button type="button" class="quick-view-btn" data-id="${product.id}">
+                    View Item
+                  </button>
                 </div>
               </div>
             </article>
@@ -380,6 +449,14 @@
         loadMoreBtn.style.display =
           visibleCount >= currentProducts.length ? "none" : "inline-flex";
       }
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.classList.contains("quick-view-btn")) return;
+
+        const productId = e.target.dataset.id;
+        localStorage.setItem("selectedProductId", productId);
+        window.location.href = "/productDetails";
+      });
 
       form.addEventListener("submit", (e) => {
         e.preventDefault();

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Account Details | NorthStar Goods</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/account.css') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;800;900&display=swap"
+    rel="stylesheet"
+  >
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+  >
+</head>
+
+<body>
+  <div class="main-navbar">
+    <div class="navbar">
+      <a href="{{ url_for('home') }}">
+        <img src="{{ url_for('static', filename='images/logo-2.png') }}" class="logo" alt="NorthStar Goods">
+      </a>
+
+      <ul class="nav-links">
+        <li class="link"><a href="{{ url_for('home') }}">Home</a></li>
+        <li class="link"><a href="{{ url_for('carts') }}">Cart</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <main class="account-section">
+    <section class="account-card">
+      <div class="account-header">
+        <div id="account-avatar" class="account-avatar">U</div>
+        <div>
+          <span class="account-badge">Account Details</span>
+          <h1 id="account-email">User</h1>
+          <p>Manage your NorthStar Goods account information.</p>
+        </div>
+      </div>
+
+      <div class="account-grid">
+        <div class="info-row">
+          <span><i class="fa fa-user"></i> Name</span>
+          <p id="info-name">Not available</p>
+        </div>
+
+        <div class="info-row">
+          <span><i class="fa fa-envelope"></i> Email</span>
+          <p id="info-email">Not available</p>
+        </div>
+
+        <div class="info-row">
+          <span><i class="fa fa-phone"></i> Phone Number</span>
+          <p id="info-phone">Not available</p>
+        </div>
+
+        <div class="info-row">
+          <span><i class="fa fa-lock"></i> Password</span>
+          <p>••••••••</p>
+        </div>
+
+        <div class="info-row">
+          <span><i class="fa fa-check-circle"></i> Status</span>
+          <p class="status-pill">Logged In</p>
+        </div>
+      </div>
+
+      <div class="account-actions">
+        <a href="/forgot-password" class="secondary-btn">Change Password</a>
+        <button class="logout-btn" onclick="logout()">Sign Out</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function getUserData(token) {
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        const email = payload.sub || payload.identity || payload.email || "";
+        const name = payload.name || "";
+        const phone = payload.phone_number || payload.phone || "";
+
+        return {
+          email,
+          name,
+          phone,
+          initial: email.charAt(0).toUpperCase() || "U"
+        };
+      } catch {
+        return { email: "User", name: "", phone: "", initial: "U" };
+      }
+    }
+
+    function getAvatarColor(letter) {
+      const colors = ["#2BD1F0", "#4F46E5", "#16A34A", "#F97316", "#9333EA", "#DC2626", "#0284C7"];
+      return colors[letter.charCodeAt(0) % colors.length];
+    }
+
+    async function loadAccount() {
+  const token = localStorage.getItem("access_token");
+
+  if (!token) {
+    window.location.href = "/login";
+    return;
+  }
+
+  const basicUser = getUserData(token);
+
+  // avatar
+  const avatar = document.getElementById("account-avatar");
+  avatar.textContent = basicUser.initial;
+  avatar.style.backgroundColor = getAvatarColor(basicUser.initial);
+
+  try {
+    const res = await fetch("/auth/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const user = await res.json();
+
+    document.getElementById("account-email").textContent = user.email || "User";
+    document.getElementById("info-email").textContent = user.email || "Not available";
+    document.getElementById("info-phone").textContent = user.phone_number || "Not available";
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+    function logout() {
+      localStorage.removeItem("access_token");
+      window.location.href = "/login";
+    }
+
+    loadAccount();
+  </script>
+</body>
+</html>

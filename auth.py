@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from werkzeug.security import check_password_hash
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from datetime import timedelta
 from extensions import db
 from models import User
@@ -24,15 +24,8 @@ def register():
     if not security_question or not security_answer:
         return jsonify({"error": "Security question and answer are required"}), 400
 
-    # ✅ Check email exists
     if User.query.filter_by(email=email).first():
         return jsonify({"error": "Email already exists"}), 409
-
-    # ✅ FIX: Check phone number exists
-    if phone_number:
-        existing_phone = User.query.filter_by(phone_number=phone_number).first()
-        if existing_phone:
-            return jsonify({"error": "Phone number already exists"}), 409
 
     try:
         new_user = User(email=email, phone_number=phone_number)
@@ -75,6 +68,23 @@ def login():
     )
 
     return jsonify({"access_token": access_token}), 200
+
+
+@auth_bp.route("/me", methods=["GET"])
+@jwt_required()
+def me():
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    return jsonify({
+        "id": user.id,
+        "email": user.email,
+        "phone_number": user.phone_number,
+        "created_at": user.created_at.isoformat() if user.created_at else None,
+    }), 200
 
 
 @auth_bp.route("/forgot-password", methods=["POST"])

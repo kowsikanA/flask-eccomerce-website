@@ -17,16 +17,29 @@ load_dotenv()
 def create_app():
     app = Flask(__name__)
 
-    # Flask config
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI")
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 
-    # Initialize extensions
     db.init_app(app)
     jwt.init_app(app)
 
-    # Register blueprints
+    # Create database tables when Gunicorn/Render starts the app
+    with app.app_context():
+        db.create_all()
+        print("Database tables created")
+
+        try:
+            products = [product.to_dict() for product in Product.query.all()]
+
+            if os.path.exists("campaign.json"):
+                os.remove("campaign.json")
+
+            with open("campaign.json", "w") as f:
+                json.dump(products, f, indent=4)
+        except Exception as e:
+            print("Could not generate campaign.json:", e)
+
     app.register_blueprint(auth_bp, url_prefix="/auth")
     app.register_blueprint(orders_bp, url_prefix="/api")
     app.register_blueprint(carts_bp, url_prefix="/api")
@@ -77,17 +90,5 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
-
-    with app.app_context():
-        db.create_all()
-        print("Database tables created")
-
-        products = [product.to_dict() for product in Product.query.all()]
-
-        if os.path.exists("campaign.json"):
-            os.remove("campaign.json")
-
-        with open("campaign.json", "w") as f:
-            json.dump(products, f, indent=4)
-
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    port = int(os.environ.get("PORT", 5001))
+    app.run(host="0.0.0.0", port=port, debug=True)

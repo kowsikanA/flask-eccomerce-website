@@ -94,7 +94,12 @@
       }),
     });
 
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error("Invalid JSON response");
+    }
 
     if (res.status === 201) {
       document.querySelector(".signup-suc").style.display = "flex";
@@ -104,20 +109,16 @@
         window.location.href = "/login";
       }, 2000);
 
-    } else if (res.status === 409) {
-      document.querySelector(".signup-fail").textContent = "Email already exists.";
-      document.querySelector(".signup-fail").style.display = "flex";
-      document.querySelector(".signup-suc").style.display = "none";
-
     } else {
-      document.querySelector(".signup-fail").textContent = data.error || "Something went wrong.";
+      document.querySelector(".signup-fail").textContent =
+        data.error || "Signup failed";
       document.querySelector(".signup-fail").style.display = "flex";
       document.querySelector(".signup-suc").style.display = "none";
     }
 
   } catch (error) {
-    console.log(error);
-    alert("Network Error.");
+    console.error("Signup error:", error);
+    alert("Network Error (check backend logs)");
   }
 }
   </script>

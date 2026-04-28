@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from extensions import db, jwt
 from auth import auth_bp
 from products import products_bp
@@ -84,6 +84,10 @@ def create_app():
     @app.route("/productDetails")
     def product_details():
         return render_template("productDetails.html")
+
+    @app.route("/search")
+    def search():
+        return render_template("search.html")
 
     return app
 

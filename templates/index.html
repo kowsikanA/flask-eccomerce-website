@@ -4,6 +4,7 @@
     <title>NorthStar Goods</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +16,239 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     >
+
+    <!-- <style>
+      :root {
+        --ns-dark: #1A1A1F;
+        --ns-white: #F8FAFC;
+        --ns-cyan: #2BD1F0;
+        --ns-light-cyan: #7FE9FF;
+        --ns-green: #2CCF33;
+      }
+
+      body {
+        background: var(--ns-white);
+      }
+
+      .category-nav {
+        background: var(--ns-dark);
+        border-top: 1px solid rgba(127, 233, 255, 0.18);
+        border-bottom: 1px solid rgba(127, 233, 255, 0.18);
+        padding: 12px 20px;
+        overflow-x: auto;
+      }
+
+      .category-nav-inner {
+  display: flex;
+  justify-content: center;   /* ✅ centers horizontally */
+  align-items: center;
+  gap: 12px;
+  max-width: 1300px;
+  margin: 0 auto;
+  flex-wrap: wrap;           /* ✅ allows wrapping on smaller screens */
+}
+
+      .category-pill {
+        border: 1px solid rgba(127, 233, 255, 0.45);
+        background: rgba(43, 209, 240, 0.12);
+        color: var(--ns-white);
+        padding: 9px 16px;
+        border-radius: 999px;
+        cursor: pointer;
+        font-weight: 700;
+        transition: 0.2s ease;
+      }
+
+      .category-pill:hover,
+      .category-pill.active {
+        background: var(--ns-cyan);
+        color: #000;
+      }
+
+      .retail-section {
+        padding: 65px 28px;
+      }
+
+      .retail-heading {
+        text-align: center;
+        margin-bottom: 34px;
+      }
+
+      .retail-heading span {
+        color: var(--ns-cyan);
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 13px;
+      }
+
+      .retail-heading h2 {
+        color: var(--ns-dark);
+        font-size: 38px;
+        margin-top: 8px;
+      }
+
+      .retail-heading p {
+        color: #64748b;
+        margin-top: 10px;
+      }
+
+      .department-grid {
+        max-width: 1250px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+        gap: 20px;
+      }
+
+      .department-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        padding: 26px 18px;
+        text-align: center;
+        cursor: pointer;
+        box-shadow: 0 12px 28px rgba(26, 26, 31, 0.08);
+        transition: 0.25s ease;
+      }
+
+      .department-card:hover {
+        transform: translateY(-7px);
+        border-color: var(--ns-cyan);
+        box-shadow: 0 18px 38px rgba(43, 209, 240, 0.2);
+      }
+
+      .department-card i {
+        font-size: 34px;
+        color: var(--ns-cyan);
+        margin-bottom: 14px;
+      }
+
+      .department-card h3 {
+        color: var(--ns-dark);
+        font-size: 18px;
+        margin-bottom: 7px;
+      }
+
+      .department-card p {
+        color: #64748b;
+        font-size: 14px;
+      }
+
+      .deal-strip {
+        background: linear-gradient(135deg, var(--ns-dark), #000);
+        padding: 55px 28px;
+      }
+
+      .deal-strip-box {
+        max-width: 1250px;
+        margin: 0 auto;
+        background: linear-gradient(135deg, var(--ns-cyan), var(--ns-light-cyan));
+        border-radius: 28px;
+        padding: 45px;
+        display: grid;
+        grid-template-columns: 1.3fr 0.7fr;
+        gap: 25px;
+        align-items: center;
+        color: #000;
+      }
+
+      .deal-strip-box h2 {
+        font-size: 42px;
+        margin-bottom: 12px;
+      }
+
+      .deal-strip-box p {
+        font-size: 18px;
+        line-height: 1.6;
+      }
+
+      .deal-highlight {
+        background: var(--ns-dark);
+        color: var(--ns-white);
+        padding: 28px;
+        border-radius: 20px;
+        text-align: center;
+      }
+
+      .deal-highlight span {
+        color: var(--ns-green);
+        font-size: 14px;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .deal-highlight h3 {
+        font-size: 28px;
+        margin-top: 8px;
+      }
+
+      .retail-benefits {
+        background: var(--ns-dark);
+      }
+
+      .retail-benefits .retail-heading h2 {
+        color: var(--ns-white);
+      }
+
+      .retail-benefits .retail-heading p {
+        color: #cbd5e1;
+      }
+
+      .benefit-grid {
+        max-width: 1250px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+        gap: 22px;
+      }
+
+      .benefit-card {
+        background: rgba(248, 250, 252, 0.06);
+        border: 1px solid rgba(127, 233, 255, 0.18);
+        border-radius: 22px;
+        padding: 28px;
+        color: var(--ns-white);
+      }
+
+      .benefit-card i {
+        color: var(--ns-green);
+        font-size: 30px;
+        margin-bottom: 14px;
+      }
+
+      .benefit-card h3 {
+        margin-bottom: 8px;
+      }
+
+      .benefit-card p {
+        color: #cbd5e1;
+        line-height: 1.6;
+      }
+
+      .offers {
+        background: var(--ns-white) !important;
+      }
+
+      .offers .section-heading h2 {
+        color: var(--ns-dark);
+      }
+
+      .offers .section-heading p {
+        color: #64748b;
+      }
+
+      @media (max-width: 850px) {
+        .deal-strip-box {
+          grid-template-columns: 1fr;
+          padding: 32px;
+        }
+
+        .deal-strip-box h2 {
+          font-size: 32px;
+        }
+      }
+    </style> -->
   </head>
 
   <body>
@@ -24,30 +258,32 @@
         <a href="{{ url_for('home') }}">
           <img
             src="{{ url_for('static', filename='images/logo-2.png') }}"
-            alt="logo"
+            alt="NorthStar Goods logo"
             class="logo"
           >
         </a>
 
         <ul class="nav-links">
-          <div class="search-bar">
-            <form action="">
+          <li class="search-bar">
+            <form action="/search" method="GET">
               <input
                 type="search"
-                name="product-search"
+                name="query"
                 id="product-search"
-                placeholder="Search for products"
+                placeholder="Search anything: beauty, groceries, laptops, furniture..."
               >
-              <button class="search-btn">
+              <button class="search-btn" type="submit">
                 <i class="fa fa-search"></i>
               </button>
             </form>
-          </div>
+          </li>
+
           <li class="link">
             <a href="{{ url_for('login') }}" id="auth-link">Sign In</a>
           </li>
+
           <li class="link">
-            <a href="{{ url_for('carts') }}">
+            <a href="{{ url_for('carts') }}" aria-label="Cart">
               <i
                 class="fa fa-shopping-cart cart-icon"
                 aria-hidden="true"
@@ -57,13 +293,159 @@
           </li>
         </ul>
       </div>
+
+      <!-- Category Navbar -->
+      <div class="category-nav">
+        <div class="category-nav-inner" id="category-nav-inner">
+          <button class="category-pill active" data-category="all">All</button>
+          <button class="category-pill" data-category="smartphones">Phones</button>
+          <button class="category-pill" data-category="laptops">Laptops</button>
+          <button class="category-pill" data-category="beauty">Beauty</button>
+          <button class="category-pill" data-category="fragrances">Fragrances</button>
+          <button class="category-pill" data-category="groceries">Groceries</button>
+          <button class="category-pill" data-category="furniture">Furniture</button>
+          <button class="category-pill" data-category="home-decoration">Home</button>
+          <button class="category-pill" data-category="mens-shirts">Men</button>
+          <button class="category-pill" data-category="womens-dresses">Women</button>
+          <button class="category-pill" data-category="sports-accessories">Sports</button>
+        </div>
+      </div>
     </div>
 
-    <!-- Special offer grid -->
-    <div class="offers">
-      <h1 style="color: #F8FAFC; font-size: 45px;">Black Friday Offers</h1>
-      <div id="product-list"></div>
-    </div>
+    <!-- Hero section -->
+    <section class="hero">
+      <div class="hero-content">
+        <span class="hero-badge">Everyday Deals</span>
+        <h1>Shop more than tech with NorthStar Goods</h1>
+        <p>
+          Browse electronics, beauty, groceries, home items, fashion, accessories,
+          and more in one clean shopping experience.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#product-list" class="hero-btn primary">Shop Products</a>
+          <a href="{{ url_for('carts') }}" class="hero-btn secondary">View Cart</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Shop by Department -->
+    <section class="retail-section">
+      <div class="retail-heading">
+        <span>Shop by Department</span>
+        <h2>Explore popular categories</h2>
+        <p>Find products the same way you would on a large retail homepage.</p>
+      </div>
+
+      <div class="department-grid">
+        <div class="department-card" data-category-card="smartphones">
+          <i class="fa fa-mobile"></i>
+          <h3>Phones</h3>
+          <p>Smartphones and mobile devices</p>
+        </div>
+
+        <div class="department-card" data-category-card="laptops">
+          <i class="fa fa-laptop"></i>
+          <h3>Laptops</h3>
+          <p>Work, school, and gaming laptops</p>
+        </div>
+
+        <div class="department-card" data-category-card="beauty">
+          <i class="fa fa-heart"></i>
+          <h3>Beauty</h3>
+          <p>Beauty and personal care picks</p>
+        </div>
+
+        <div class="department-card" data-category-card="groceries">
+          <i class="fa fa-shopping-basket"></i>
+          <h3>Groceries</h3>
+          <p>Everyday grocery essentials</p>
+        </div>
+
+        <div class="department-card" data-category-card="furniture">
+          <i class="fa fa-home"></i>
+          <h3>Furniture</h3>
+          <p>Home furniture and decor</p>
+        </div>
+
+        <div class="department-card" data-category-card="mens-shirts">
+          <i class="fa fa-male"></i>
+          <h3>Men's Fashion</h3>
+          <p>Shirts, clothing, and style</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Big Deal Banner -->
+    <section class="deal-strip">
+      <div class="deal-strip-box">
+        <div>
+          <h2>Top deals across every department</h2>
+          <p>
+            Inspired by retail homepages like Best Buy and Walmart, NorthStar Goods
+            helps customers quickly browse departments, search products, and add
+            favourites to cart.
+          </p>
+        </div>
+
+        <div class="deal-highlight">
+          <span>Featured Event</span>
+          <h3>Weekly Savings</h3>
+          <p>Shop deals across electronics, home, fashion, groceries, and more.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product offers -->
+    <section class="offers">
+  <div class="section-heading">
+    <span>Featured Products</span>
+    <h2>Shop All Products</h2>
+    <p>Browse all DummyJSON categories and add your favourites to cart.</p>
+  </div>
+
+  <div id="product-list"></div>
+
+  <!-- ✅ LOAD MORE BUTTON -->
+  <div style="text-align:center; margin-top:30px;">
+    <button id="load-more-btn" class="hero-btn primary">Load More</button>
+  </div>
+</section>
+
+    <!-- Benefits Section -->
+    <section class="retail-section retail-benefits">
+      <div class="retail-heading">
+        <span>Shopping Made Simple</span>
+        <h2>Everything customers expect from a retail store</h2>
+        <p>Clear categories, easy search, product details, cart support, and checkout flow.</p>
+      </div>
+
+      <div class="benefit-grid">
+        <div class="benefit-card">
+          <i class="fa fa-search"></i>
+          <h3>Search Anything</h3>
+          <p>Search by product name, category, or description across the full product list.</p>
+        </div>
+
+        <div class="benefit-card">
+          <i class="fa fa-tags"></i>
+          <h3>Department Browsing</h3>
+          <p>Use category buttons to quickly filter products like a real retail homepage.</p>
+        </div>
+
+        <div class="benefit-card">
+          <i class="fa fa-shopping-cart"></i>
+          <h3>Cart Ready</h3>
+          <p>Signed-in users can add products directly to their cart from the modal.</p>
+        </div>
+
+        <div class="benefit-card">
+          <i class="fa fa-comments"></i>
+          <h3>AI Product Help</h3>
+          <p>Customers can ask NorthStar Assistant product-related questions while browsing.</p>
+        </div>
+      </div>
+    </section>
 
     <!-- Product details modal -->
     <div id="product-modal" class="modal hidden">
@@ -88,14 +470,14 @@
       <div class="chat-header">NorthStar Assistant</div>
       <div class="chat-body" id="chat-body">
         <div class="chat-message bot">
-          Hi! 👋. Have any questions about the products we sell, go ahead and ask us some questions.
+          Hi! 👋 Have questions about our products? Ask me anything.
         </div>
       </div>
       <div class="chat-input-row">
         <input
           type="text"
           id="chat-input"
-          placeholder="What is the latest airpod generation?"
+          placeholder="Ask about products..."
           autocomplete="off"
         >
         <button id="chat-send">Send</button>
@@ -105,7 +487,7 @@
 
     <div id="notification" class="notification"></div>
 
-    <!-- ================= FOOTER ================= -->
+    <!-- Footer -->
     <footer class="footer">
       <div class="footer-container">
         <div class="footer-section">
@@ -114,7 +496,7 @@
             class="footer-logo"
             alt="NorthStar Goods"
           >
-          <p>Your trusted online store for tech, lifestyle, and more.</p>
+          <p>Your trusted online store for tech, lifestyle, groceries, home, fashion, and more.</p>
         </div>
 
         <div class="footer-section">
@@ -151,360 +533,321 @@
         <p>© 2025 NorthStar Goods — All Rights Reserved.</p>
       </div>
     </footer>
-    <!-- =============== END FOOTER =============== -->
-  </body>
 
-  <!-- Login / logout helper -->
-  <script>
-    (function () {
-      const FLAG_KEY = "ns_initial_logout_done";
+    <!-- Login / logout helper -->
+    <script>
+      (function () {
+        const FLAG_KEY = "ns_initial_logout_done";
 
-      if (!sessionStorage.getItem(FLAG_KEY)) {
-        localStorage.removeItem("access_token");
-        sessionStorage.setItem(FLAG_KEY, "1");
-      }
-    })();
-
-    function handleLogout(event) {
-      event.preventDefault();
-      localStorage.removeItem("access_token");
-      window.location.href = "{{ url_for('login') }}";
-    }
-
-    function updateAuthLink() {
-      const authLink = document.getElementById("auth-link");
-      if (!authLink) return;
-
-      const token = localStorage.getItem("access_token");
-
-      if (token) {
-        authLink.textContent = "Sign Out";
-        authLink.href = "#";
-        authLink.onclick = handleLogout;
-      } else {
-        authLink.textContent = "Sign In";
-        authLink.href = "{{ url_for('login') }}";
-        authLink.onclick = null;
-      }
-    }
-
-    document.addEventListener("DOMContentLoaded", updateAuthLink);
-  </script>
-
-  <!-- Product listing, modal, search -->
-  <script>
-    let selectedProduct = null;
-    let allProducts = [];
-
-    function renderProducts(products) {
-      const productListDiv = document.getElementById("product-list");
-      if (!productListDiv) {
-        console.error("No element with id 'product-list' found in the DOM.");
-        return;
-      }
-
-      productListDiv.innerHTML = "";
-
-      if (!products || products.length === 0) {
-        productListDiv.innerHTML = "<p style='color:white;'>No products found.</p>";
-        return;
-      }
-
-      products.forEach((product) => {
-        const productDiv = document.createElement("div");
-        productDiv.className = "product";
-
-        const img = document.createElement("img");
-        img.src = product.thumbnail;
-        img.alt = product.title;
-        img.className = "product-image";
-
-        const title = document.createElement("p");
-        title.className = "product-name";
-        title.textContent =
-          product.title.length > 25
-            ? product.title.substring(0, 25) + "..."
-            : product.title;
-
-        const price = document.createElement("h3");
-        price.className = "product-price";
-        price.textContent = `$${product.price}`;
-
-        productDiv.addEventListener("click", () => {
-          openProductModal(product);
-        });
-
-        productDiv.appendChild(img);
-        productDiv.appendChild(title);
-        productDiv.appendChild(price);
-
-        productListDiv.appendChild(productDiv);
-      });
-    }
-
-    async function fetchProducts() {
-      try {
-        const res = await fetch(
-          "https://dummyjson.com/products?limit=0&select=title,price,thumbnail,category,description"
-        );
-
-        if (!res.ok) {
-          throw new Error(`Response status: ${res.status}`);
+        if (!sessionStorage.getItem(FLAG_KEY)) {
+          localStorage.removeItem("access_token");
+          sessionStorage.setItem(FLAG_KEY, "1");
         }
+      })();
 
-        const data = await res.json();
-        let products = data.products || [];
-
-        const allowedCategories = ["smartphones", "laptops", "mobile-accessories"];
-
-        products = products.filter((product) =>
-          allowedCategories.includes(product.category)
-        );
-
-        allProducts = products;
-        renderProducts(products);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-
-        const productListDiv = document.getElementById("product-list");
-        if (productListDiv) {
-          productListDiv.innerHTML =
-            "<p style='color:white;'>Sorry, we couldn't load the products right now.</p>";
-        }
-
-        showNotification(
-          "We couldn't load products. Please refresh the page.",
-          "error"
-        );
-      }
-    }
-
-    const modal = document.getElementById("product-modal");
-    const modalImage = document.getElementById("modal-image");
-    const modalTitle = document.getElementById("modal-title");
-    const modalCategory = document.getElementById("modal-category");
-    const modalPrice = document.getElementById("modal-price");
-    const modalDescription = document.getElementById("modal-description");
-    const modalCloseBtn = document.getElementById("modal-close");
-    const modalAddToCartBtn = document.getElementById("modal-add-to-cart");
-    const viewDetailsBtn = document.getElementById("modal-view-details");
-
-    function openProductModal(product) {
-      selectedProduct = product;
-
-      modalImage.src = product.thumbnail;
-      modalImage.alt = product.title;
-      modalTitle.textContent = product.title;
-      modalCategory.textContent = `Category: ${product.category}`;
-      modalPrice.textContent = `Price: $${product.price}`;
-      modalDescription.textContent =
-        product.description || "No description available.";
-
-      modal.classList.remove("hidden");
-    }
-
-    function closeProductModal() {
-      modal.classList.add("hidden");
-      selectedProduct = null;
-    }
-
-    modalCloseBtn.addEventListener("click", closeProductModal);
-
-    modal.addEventListener("click", (e) => {
-      if (e.target === modal || e.target.classList.contains("modal-backdrop")) {
-        closeProductModal();
-      }
-    });
-
-    modalAddToCartBtn.addEventListener("click", async () => {
-      if (!selectedProduct) return;
-
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        showNotification("Please sign in before adding items to your cart.", "error");
-        setTimeout(() => {
-          window.location.href = "/login";
-        }, 2000);
-        return;
-      }
-
-      try {
-        const res = await fetch("/api/cart", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            product_id: selectedProduct.id,
-            name: selectedProduct.title,
-            price: selectedProduct.price,
-            image_url: selectedProduct.thumbnail,
-            description: selectedProduct.description,
-            quantity: 1,
-          }),
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          const message = data.error || "Could not add this product to your cart.";
-          showNotification(message, "error");
-          return;
-        }
-
-        showNotification(
-          `Added "${selectedProduct.title}" to your cart.`,
-          "success"
-        );
-        closeProductModal();
-      } catch (err) {
-        console.error(err);
-        showNotification(
-          "We ran into a network error. Please try again in a moment.",
-          "error"
-        );
-      }
-    });
-
-    viewDetailsBtn.addEventListener("click", () => {
-      if (!selectedProduct) return;
-
-      localStorage.setItem("selectedProductId", selectedProduct.id);
-      window.location.href = "/productDetails";
-    });
-
-    const searchInput = document.getElementById("product-search");
-    const searchButton = document.querySelector(".search-btn");
-
-    function handleSearch() {
-      if (!allProducts || allProducts.length === 0) return;
-
-      const query = searchInput.value.trim().toLowerCase();
-
-      if (!query) {
-        renderProducts(allProducts);
-        return;
-      }
-
-      const filtered = allProducts.filter((product) => {
-        return (
-          product.title.toLowerCase().includes(query) ||
-          product.category.toLowerCase().includes(query)
-        );
-      });
-
-      renderProducts(filtered);
-    }
-
-    if (searchInput && searchButton) {
-      searchButton.addEventListener("click", (event) => {
+      function handleLogout(event) {
         event.preventDefault();
-        handleSearch();
-      });
-
-      searchInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          event.preventDefault();
-          handleSearch();
-        }
-      });
-    }
-
-    fetchProducts();
-  </script>
-
-  <!-- Chat widget logic -->
-  <script>
-    const chatWidget = document.getElementById("chat-widget");
-    const chatToggle = document.getElementById("chat-toggle");
-    const chatBody = document.getElementById("chat-body");
-    const chatInput = document.getElementById("chat-input");
-    const chatSend = document.getElementById("chat-send");
-
-    function appendMessage(role, text) {
-      const msg = document.createElement("div");
-      msg.className = "chat-message " + role;
-      msg.textContent = text;
-      chatBody.appendChild(msg);
-      chatBody.scrollTop = chatBody.scrollHeight;
-      return msg;
-    }
-
-    async function sendChat() {
-      const text = (chatInput.value || "").trim();
-      if (!text) return;
-
-      appendMessage("user", text);
-      chatInput.value = "";
-
-      const thinkingEl = appendMessage("bot", "Thinking...");
-
-      try {
-        const resp = await fetch("/ai/ask", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ prompt: text }),
-        });
-
-        if (!resp.ok) {
-          thinkingEl.textContent = "Error: " + resp.status;
-          return;
-        }
-
-        const data = await resp.json();
-        thinkingEl.textContent = data.output || "(No response from model.)";
-      } catch (err) {
-        console.error(err);
-        thinkingEl.textContent = "Network error. Please try again.";
+        localStorage.removeItem("access_token");
+        window.location.href = "{{ url_for('login') }}";
       }
-    }
 
-    chatToggle.addEventListener("click", () => {
-      chatWidget.classList.toggle("open");
+      function updateAuthLink() {
+        const authLink = document.getElementById("auth-link");
+        if (!authLink) return;
+
+        const token = localStorage.getItem("access_token");
+
+        if (token) {
+          authLink.textContent = "Sign Out";
+          authLink.href = "#";
+          authLink.onclick = handleLogout;
+        } else {
+          authLink.textContent = "Sign In";
+          authLink.href = "{{ url_for('login') }}";
+          authLink.onclick = null;
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", updateAuthLink);
+    </script>
+
+    <!-- Product listing, modal, search, categories -->
+    <script>
+let selectedProduct = null;
+let allProducts = [];
+let filteredProducts = [];
+let activeCategory = "all";
+
+let visibleCount = 5;
+const PRODUCTS_PER_LOAD = 5;
+
+function renderProducts(products) {
+  const productListDiv = document.getElementById("product-list");
+  productListDiv.innerHTML = "";
+
+  const visible = products.slice(0, visibleCount);
+
+  if (visible.length === 0) {
+    productListDiv.innerHTML =
+      "<p style='color:#64748b; text-align:center;'>No products found.</p>";
+    updateLoadMore(products);
+    return;
+  }
+
+  visible.forEach(product => {
+    const div = document.createElement("div");
+    div.className = "product";
+
+    div.innerHTML = `
+      <img src="${product.thumbnail}" class="product-image">
+      <p class="product-name">${product.title}</p>
+      <p class="product-category">${product.category}</p>
+      <h3 class="product-price">$${product.price}</h3>
+    `;
+
+    div.onclick = () => openProductModal(product);
+    productListDiv.appendChild(div);
+  });
+
+  updateLoadMore(products);
+}
+
+function updateLoadMore(products) {
+  const btn = document.getElementById("load-more-btn");
+
+  if (visibleCount >= products.length) {
+    btn.style.display = "none";
+  } else {
+    btn.style.display = "inline-block";
+  }
+}
+
+function applyFilters() {
+  let filtered = [...allProducts];
+
+  if (activeCategory !== "all") {
+    filtered = filtered.filter(p => p.category === activeCategory);
+  }
+
+  const query = document.getElementById("product-search").value.toLowerCase();
+
+  if (query) {
+    filtered = filtered.filter(p =>
+      p.title.toLowerCase().includes(query) ||
+      p.category.toLowerCase().includes(query)
+    );
+  }
+
+  filteredProducts = filtered;
+  visibleCount = PRODUCTS_PER_LOAD;
+  renderProducts(filteredProducts);
+}
+
+async function fetchProducts() {
+  const res = await fetch(
+    "https://dummyjson.com/products?limit=0&select=id,title,price,thumbnail,category,description"
+  );
+  const data = await res.json();
+
+  allProducts = data.products;
+  filteredProducts = allProducts;
+
+  renderProducts(filteredProducts);
+}
+
+// LOAD MORE
+document.getElementById("load-more-btn").onclick = () => {
+  visibleCount += PRODUCTS_PER_LOAD;
+  renderProducts(filteredProducts);
+};
+
+// CATEGORY FILTER
+document.querySelectorAll(".category-pill").forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll(".category-pill").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+
+    activeCategory = btn.dataset.category;
+    applyFilters();
+  };
+});
+
+// SEARCH
+document.getElementById("product-search").addEventListener("input", applyFilters);
+
+// MODAL
+function openProductModal(product) {
+  selectedProduct = product;
+
+  document.getElementById("modal-image").src = product.thumbnail;
+  document.getElementById("modal-title").textContent = product.title;
+  document.getElementById("modal-category").textContent = product.category;
+  document.getElementById("modal-price").textContent = "$" + product.price;
+  document.getElementById("modal-description").textContent = product.description;
+
+  document.getElementById("product-modal").classList.remove("hidden");
+}
+
+document.getElementById("modal-close").onclick = () => {
+  document.getElementById("product-modal").classList.add("hidden");
+};
+
+// ✅ FIXED: View Details routing
+document.getElementById("modal-view-details").onclick = () => {
+  if (!selectedProduct) return;
+
+  // store product for next page
+  localStorage.setItem("selectedProductId", selectedProduct.id);
+
+  // redirect
+  window.location.href = "/productDetails";
+};
+
+document.getElementById("modal-add-to-cart").onclick = async () => {
+  if (!selectedProduct) return;
+
+  const token = localStorage.getItem("access_token");
+
+  if (!token) {
+    showNotification("Please sign in before adding items to your cart.", "error");
+
+    setTimeout(() => {
+      window.location.href = "/login";
+    }, 1500);
+
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/cart", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        product_id: selectedProduct.id,
+        name: selectedProduct.title,
+        price: selectedProduct.price,
+        image_url: selectedProduct.thumbnail,
+        description: selectedProduct.description,
+        quantity: 1,
+      }),
     });
 
-    chatSend.addEventListener("click", sendChat);
+    const data = await res.json();
 
-    chatInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        sendChat();
+    if (!res.ok) {
+      showNotification(data.error || "Could not add item to cart.", "error");
+      return;
+    }
+
+    showNotification(`Added "${selectedProduct.title}" to your cart.`, "success");
+
+    document.getElementById("product-modal").classList.add("hidden");
+
+  } catch (err) {
+    console.error(err);
+    showNotification("Network error. Please try again.", "error");
+  }
+};
+
+fetchProducts();
+</script>
+
+    <!-- Chat widget logic -->
+    <script>
+      const chatWidget = document.getElementById("chat-widget");
+      const chatToggle = document.getElementById("chat-toggle");
+      const chatBody = document.getElementById("chat-body");
+      const chatInput = document.getElementById("chat-input");
+      const chatSend = document.getElementById("chat-send");
+
+      function appendMessage(role, text) {
+        const msg = document.createElement("div");
+        msg.className = "chat-message " + role;
+        msg.textContent = text;
+        chatBody.appendChild(msg);
+        chatBody.scrollTop = chatBody.scrollHeight;
+        return msg;
       }
-    });
-  </script>
 
-  <!-- Notification helper -->
-  <script>
-    const notificationEl = document.getElementById("notification");
-    let notificationTimeout;
+      async function sendChat() {
+        const text = (chatInput.value || "").trim();
+        if (!text) return;
 
-    function showNotification(message, type = "success", duration = 3000) {
-      if (!notificationEl) return;
+        appendMessage("user", text);
+        chatInput.value = "";
 
-      notificationEl.className = "notification";
-      notificationEl.textContent = message;
+        const thinkingEl = appendMessage("bot", "Thinking...");
 
-      if (type === "success") {
-        notificationEl.classList.add("notification-success");
-      } else if (type === "error") {
-        notificationEl.classList.add("notification-error");
+        try {
+          const resp = await fetch("/ai/ask", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ prompt: text }),
+          });
+
+          if (!resp.ok) {
+            thinkingEl.textContent = "Error: " + resp.status;
+            return;
+          }
+
+          const data = await resp.json();
+          thinkingEl.textContent = data.output || "(No response from model.)";
+        } catch (err) {
+          console.error(err);
+          thinkingEl.textContent = "Network error. Please try again.";
+        }
       }
 
-      notificationEl.classList.add("show");
+      chatToggle.addEventListener("click", () => {
+        chatWidget.classList.toggle("open");
+      });
 
-      if (notificationTimeout) {
-        clearTimeout(notificationTimeout);
+      chatSend.addEventListener("click", sendChat);
+
+      chatInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          sendChat();
+        }
+      });
+    </script>
+
+    <!-- Notification helper -->
+    <script>
+      const notificationEl = document.getElementById("notification");
+      let notificationTimeout;
+
+      function showNotification(message, type = "success", duration = 3000) {
+        if (!notificationEl) return;
+
+        notificationEl.className = "notification";
+        notificationEl.textContent = message;
+
+        if (type === "success") {
+          notificationEl.classList.add("notification-success");
+        } else if (type === "error") {
+          notificationEl.classList.add("notification-error");
+        }
+
+        notificationEl.classList.add("show");
+
+        if (notificationTimeout) {
+          clearTimeout(notificationTimeout);
+        }
+
+        notificationTimeout = setTimeout(() => {
+          notificationEl.classList.remove("show");
+        }, duration);
       }
-      notificationTimeout = setTimeout(() => {
+
+      notificationEl?.addEventListener("click", () => {
         notificationEl.classList.remove("show");
-      }, duration);
-    }
-
-    notificationEl?.addEventListener("click", () => {
-      notificationEl.classList.remove("show");
-    });
-  </script>
+      });
+    </script>
+  </body>
 </html>

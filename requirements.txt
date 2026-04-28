@@ -1,4 +1,4 @@
-Flask
+Flask==2.1.2
 pytest
 pytest-flask
 Flask-SQLAlchemy

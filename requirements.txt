@@ -1,7 +1,9 @@
 Flask==2.1.2
 Werkzeug==2.1.2
 
-Flask-SQLAlchemy
+Flask-SQLAlchemy==2.5.1
+SQLAlchemy==1.4.46
+
 Flask-JWT-Extended
 python-dotenv
 requests
@@ -9,6 +11,5 @@ stripe
 groq
 
 gunicorn
-
 pytest
 pytest-flask

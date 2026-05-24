@@ -85,7 +85,7 @@ def add_to_cart():
         return jsonify({"error": "user not found"}), 404
 
     cart_item = CartItem.query.filter_by(
-        user_id=user.id, product_id=product_id
+    user_id=user.id, product_id=product_id_int
     ).first()
 
     if cart_item:
@@ -93,7 +93,7 @@ def add_to_cart():
     else:
         cart_item = CartItem(
             user_id=user.id,
-            product_id=product_id,
+            product_id=product_id_int,
             quantity=quantity,
         )
         db.session.add(cart_item)

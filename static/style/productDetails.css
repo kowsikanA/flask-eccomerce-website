@@ -5,14 +5,16 @@
   font-family: "Roboto", sans-serif;
 }
 
-html {
-  scroll-behavior: smooth;
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
 }
 
 body {
   background-color: #eff5f9;
   color: #0f172a;
-  min-height: 100vh;
 }
 
 /* Navbar */
@@ -169,7 +171,7 @@ li a {
   color: #f4c518;
 }
 
-.star-rating i.fa-regular.fa-star {
+.star-rating i.fa-star-o {
   color: #ccc;
 }
 
@@ -232,7 +234,7 @@ li a {
 /* Related products */
 .related-products {
   max-width: 1250px;
-  margin: 50px auto 60px;
+  margin: 50px auto 35px;
   padding: 0 30px;
 }
 
@@ -293,10 +295,9 @@ li a {
   color: #0f172a;
   cursor: pointer;
   padding: 22px 28px;
-  width: calc(100% - 60px);
-  max-width: 1250px;
+  width: 100%;
   display: block;
-  margin: 14px auto 0;
+  margin: 14px 0 0;
   border: 1px solid #e2e8f0;
   text-align: left;
   outline: none;
@@ -307,6 +308,20 @@ li a {
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
 }
 
+.accordion-wrapper {
+  max-width: 1250px;
+  width: calc(100% - 60px);
+  margin: 40px auto 90px;
+  position: relative;
+  clear: both;
+}
+
+.accordion-wrapper .accordion {
+  width: 100%;
+  margin: 14px 0 0;
+}
+
+
 .active,
 .accordion:hover {
   background-color: #e6f6fa;
@@ -314,9 +329,8 @@ li a {
 }
 
 .panel {
-  width: calc(100% - 60px);
-  max-width: 1250px;
-  margin: 0 auto 14px;
+  width: 100%;
+  margin: 0 0 14px;
   padding: 0 18px;
   display: none;
   background-color: #ffffff;
@@ -326,6 +340,10 @@ li a {
   border-top: none;
 }
 
+.accordion-wrapper .panel {
+  width: 100%;
+  margin: 0 0 14px;
+}
 .product-description {
   padding: 24px 10px;
 }
@@ -566,9 +584,10 @@ li a {
 .footer {
   background: #0f172a;
   color: #f8fafc;
-  padding: 50px 20px 20px;
-  margin-top: 70px;
-  font-family: "Roboto", sans-serif;
+  padding: 60px 20px 20px;
+  margin-top: 0;
+  position: relative;
+  clear: both;
 }
 
 .footer-container {
@@ -650,6 +669,28 @@ li a {
   color: #94a3b8;
 }
 
+.view-more-wrapper {
+  text-align: center;
+  margin-top: 28px;
+  margin-bottom: 0;
+}
+
+.view-more-btn {
+  display: inline-block;
+  background-color: #2563eb;
+  color: white;
+  padding: 13px 28px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 800;
+  transition: 0.2s ease;
+}
+
+.view-more-btn:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-2px);
+}
+
 /* Responsive */
 @media (max-width: 950px) {
   .navbar {
@@ -699,5 +740,155 @@ li a {
 
   .notification.show {
     transform: translateY(0);
+  }
+}
+
+
+
+
+
+/* ================= WALMART STYLE REVIEWS ================= */
+
+.hidden {
+  display: none;
+}
+
+.review-top-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.review-left h4 {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.review-subtitle {
+  color: #64748b;
+  margin-bottom: 18px;
+}
+
+.write-review-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.write-review-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-2px);
+}
+
+.overall-rating {
+  text-align: center;
+}
+
+.overall-rating h2 {
+  font-size: 42px;
+  margin-top: 8px;
+}
+
+.overall-rating-stars {
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  color: #f4c518;
+}
+
+.add-review-box {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.add-review-box h4 {
+  margin-bottom: 18px;
+  font-size: 22px;
+}
+
+.add-review-box input,
+.add-review-box textarea,
+.add-review-box select {
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+.add-review-box textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.review-btn-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.review-btn-row button {
+  border: none;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+#submit-review-btn {
+  background: #2563eb;
+  color: white;
+}
+
+#submit-review-btn:hover {
+  background: #1d4ed8;
+}
+
+#cancel-review-btn {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+#cancel-review-btn:hover {
+  background: #cbd5e1;
+}
+
+.review-star-select label {
+  font-weight: 700;
+  color: #334155;
+}
+
+.star-rating i.fa-star-o {
+  color: #cbd5e1;
+}
+
+@media (max-width: 768px) {
+  .review-top-section {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .review-btn-row {
+    flex-direction: column;
+  }
+
+  .review-btn-row button {
+    width: 100%;
   }
 }

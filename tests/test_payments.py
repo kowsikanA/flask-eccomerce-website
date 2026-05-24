@@ -57,7 +57,7 @@ def test_checkout_empty_cart_returns_400(client):
     assert resp.status_code == 400
 
     data = resp.get_json()
-    assert data["error"] == "cart is empty"
+    assert data["error"] == "Cart is empty"
 
 
 def test_checkout_success_creates_session_and_clears_cart(client, monkeypatch):

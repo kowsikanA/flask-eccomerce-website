@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from groq import Groq
 from models import Product
 from products import fetchApiProducts
@@ -15,26 +15,12 @@ GROQ_MODEL = "openai/gpt-oss-120b"
 
 
 def clean_words(text):
-    """
-    Cleans user text for easier keyword matching.
-    """
-
     text = (text or "").lower()
-
     text = re.sub(r"[^a-z0-9\s]", " ", text)
-
-    return [
-        word
-        for word in text.split()
-        if len(word) > 2
-    ]
+    return [word for word in text.split() if len(word) > 2]
 
 
 def get_product_link(product):
-    """
-    Builds clickable product details URL.
-    """
-
     return (
         "https://flask-eccomerce-website.onrender.com/"
         f"productDetails?id={product.id}"
@@ -42,92 +28,41 @@ def get_product_link(product):
 
 
 def get_stock_status(product):
-    """
-    Returns stock availability text.
-    """
-
-    stock = getattr(product, "stock", None)
-
     inventory = getattr(product, "inventory", None)
-
     available = getattr(product, "available", None)
 
-    if stock is not None:
-        return (
-            f"In Stock ({stock} available)"
-            if stock > 0
-            else "Out of Stock"
-        )
-
     if inventory is not None:
-        return (
-            f"In Stock ({inventory} available)"
-            if inventory > 0
-            else "Out of Stock"
-        )
+        return f"In Stock ({inventory} available)" if inventory > 0 else "Out of Stock"
 
     if available is not None:
-        return (
-            "Available"
-            if available
-            else "Out of Stock"
-        )
+        return "Available" if available else "Out of Stock"
 
     return "Available"
 
 
-def product_text(product):
-    """
-    Combines searchable product text.
-    """
-
-    return f"""
-    {getattr(product, "name", "") or ""}
-    {getattr(product, "description", "") or ""}
-    {getattr(product, "category", "") or ""}
-    {getattr(product, "brand", "") or ""}
-    """.lower()
-
-
 def score_product_match(product, prompt):
-    """
-    Gives products a relevance score.
-    Higher score = better match.
-    """
-
     prompt_lower = (prompt or "").lower()
-
     prompt_words = clean_words(prompt_lower)
 
     name = getattr(product, "name", "") or ""
-
     description = getattr(product, "description", "") or ""
-
     category = getattr(product, "category", "") or ""
-
     brand = getattr(product, "brand", "") or ""
 
-    searchable_text = (
-        f"{name} {description} {category} {brand}"
-    ).lower()
-
+    searchable_text = f"{name} {description} {category} {brand}".lower()
     product_words = clean_words(searchable_text)
 
     score = 0
 
-    # exact name match
     if name.lower() and name.lower() in prompt_lower:
         score += 30
 
-    # category match
     if category.lower() and category.lower() in prompt_lower:
         score += 20
 
-    # brand match
     if brand.lower() and brand.lower() in prompt_lower:
         score += 15
 
-    # keyword match
     for word in prompt_words:
         if word in product_words:
             score += 4
@@ -136,232 +71,204 @@ def score_product_match(product, prompt):
 
 
 def detect_category(prompt):
-    """
-    Detects product category from user message.
-    """
-
     prompt_lower = (prompt or "").lower()
 
     category_map = {
-        "laptops": [
-            "laptop",
-            "laptops",
-            "computer",
-            "computers",
-            "macbook",
-        ],
-
-        "smartphones": [
-            "phone",
-            "phones",
-            "smartphone",
-            "smartphones",
-            "iphone",
-            "android",
-            "samsung",
-        ],
-
-        "beauty": [
-            "beauty",
-            "makeup",
-            "cosmetic",
-            "cosmetics",
-            "skincare",
-        ],
-
-        "fragrances": [
-            "fragrance",
-            "fragrances",
-            "perfume",
-            "cologne",
-        ],
-
-        "groceries": [
-            "grocery",
-            "groceries",
-            "food",
-            "snack",
-            "snacks",
-            "steak",
-        ],
-
-        "furniture": [
-            "furniture",
-            "chair",
-            "table",
-            "desk",
-            "sofa",
-        ],
-
-        "mens-shirts": [
-            "men",
-            "mens",
-            "shirt",
-            "shirts",
-        ],
-
-        "womens-dresses": [
-            "women",
-            "womens",
-            "dress",
-            "dresses",
-        ],
-
-        "sports-accessories": [
-            "sport",
-            "sports",
-            "fitness",
-            "ball",
-            "accessories",
-        ],
+        "laptops": ["laptop", "laptops", "computer", "computers", "macbook"],
+        "smartphones": ["phone", "phones", "smartphone", "smartphones", "iphone", "android", "samsung"],
+        "beauty": ["beauty", "makeup", "cosmetic", "cosmetics", "skincare"],
+        "fragrances": ["fragrance", "fragrances", "perfume", "cologne"],
+        "groceries": ["grocery", "groceries", "food", "snack", "snacks", "steak"],
+        "furniture": ["furniture", "chair", "table", "desk", "sofa"],
+        "mens-shirts": ["men", "mens", "shirt", "shirts"],
+        "womens-dresses": ["women", "womens", "dress", "dresses"],
+        "sports-accessories": ["sport", "sports", "fitness", "ball", "accessories"],
     }
 
     for category, keywords in category_map.items():
-
-        if any(
-            keyword in prompt_lower
-            for keyword in keywords
-        ):
+        if any(keyword in prompt_lower for keyword in keywords):
             return category
 
     return None
 
 
+def is_product_query(prompt):
+    text = (prompt or "").lower()
+
+    product_keywords = [
+        "product", "products", "item", "items",
+        "recommend", "suggest", "show", "find", "search",
+        "cheap", "cheapest", "affordable", "budget",
+        "expensive", "premium", "best", "top", "rating", "rated",
+        "price", "cost", "buy", "purchase", "stock", "available",
+        "laptop", "laptops", "computer", "computers", "macbook",
+        "phone", "phones", "smartphone", "smartphones", "iphone", "android", "samsung",
+        "groceries", "grocery", "food", "snack", "steak",
+        "furniture", "chair", "table", "desk", "sofa",
+        "beauty", "makeup", "skincare", "cosmetics",
+        "fragrance", "perfume", "cologne",
+        "shirt", "dress", "sports", "gaming", "electronics",
+        "explain", "details", "tell me about",
+    ]
+
+    follow_up_keywords = [
+        "which one",
+        "which is better",
+        "best one",
+        "highest rated",
+        "top rated",
+        "what about",
+        "that one",
+    ]
+
+    return (
+        any(keyword in text for keyword in product_keywords)
+        or any(keyword in text for keyword in follow_up_keywords)
+    )
+
+
+def build_not_found_response(message=None):
+    return f"""
+    <div style='line-height:1.6;'>
+        <strong>{message or "No matching products found."}</strong>
+        <br><br>
+        Try searching for:
+        <ul>
+            <li>Laptops</li>
+            <li>Smartphones</li>
+            <li>Beauty products</li>
+            <li>Furniture</li>
+            <li>Groceries</li>
+        </ul>
+    </div>
+    """
+
+
 def find_matching_products(prompt, limit=3):
-    """
-    Finds matching products from database.
-    """
-
     prompt_lower = (prompt or "").lower()
-
     products = Product.query.all()
 
     print("\n========== CHATBOT DATABASE DEBUG ==========")
-
     print("User prompt:", prompt)
-
     print("Total products in database:", len(products))
-
-    for product in products[:10]:
-
-        print({
-            "id": getattr(product, "id", None),
-            "name": getattr(product, "name", None),
-            "category": getattr(product, "category", None),
-            "price": getattr(product, "price", None),
-        })
 
     detected_category = detect_category(prompt)
 
-    wants_cheapest = any(
-        word in prompt_lower
-        for word in [
-            "cheap",
-            "cheapest",
-            "lowest",
-            "affordable",
-            "budget",
-            "low price",
-        ]
-    )
+    follow_up_phrases = [
+        "which one",
+        "best one",
+        "highest rated",
+        "top rated",
+        "which is better",
+    ]
 
-    wants_expensive = any(
-        word in prompt_lower
-        for word in [
-            "expensive",
-            "premium",
-            "highest price",
-        ]
-    )
+    if not detected_category and any(phrase in prompt_lower for phrase in follow_up_phrases):
+        detected_category = session.get("last_category")
+
+    if detected_category:
+        session["last_category"] = detected_category
+
+    wants_cheapest = any(word in prompt_lower for word in [
+        "cheap", "cheapest", "lowest", "budget", "affordable"
+    ])
+
+    wants_best_rating = any(word in prompt_lower for word in [
+        "best rating", "highest rating", "top rated", "best", "rating", "rated"
+    ])
+
+    wants_explanation = any(word in prompt_lower for word in [
+        "explain", "tell me about", "details about", "what is"
+    ])
+
+    iphone_match = re.search(r"iphone\s*\d+", prompt_lower)
+
+    if iphone_match:
+        requested_product = iphone_match.group(0)
+
+        exact_product_exists = any(
+            requested_product in (getattr(product, "name", "") or "").lower()
+            for product in products
+        )
+
+        if not exact_product_exists:
+            session["not_found_message"] = f"Sorry, we currently do not have {requested_product.title()} in our catalog."
+            return []
+
+    exact_matches = []
+
+    for product in products:
+        product_name = (getattr(product, "name", "") or "").lower()
+
+        if product_name and product_name in prompt_lower:
+            exact_matches.append(product)
+
+    if exact_matches:
+        session["last_category"] = getattr(exact_matches[0], "category", None)
+
+        return exact_matches[:limit]
 
     filtered_products = products
 
-    # category filtering
     if detected_category:
-
         filtered_products = [
             product
             for product in products
-            if detected_category in product_text(product)
+            if (getattr(product, "category", "") or "").lower() == detected_category.lower()
         ]
 
         print("Detected category:", detected_category)
+        print("Products after category filter:", len(filtered_products))
 
-        print(
-            "Products after category filter:",
-            len(filtered_products)
-        )
-
-    # no products found
     if not filtered_products and detected_category:
-
-        print(
-            "No products found for category:",
-            detected_category
-        )
-
         return []
 
-    # cheapest products
     if wants_cheapest:
-
-        filtered_products.sort(
-            key=lambda p: float(
-                getattr(p, "price", 0) or 0
-            )
-        )
-
+        filtered_products.sort(key=lambda p: float(getattr(p, "price", 0) or 0))
+        session["last_product_ids"] = [p.id for p in filtered_products[:limit]]
         return filtered_products[:limit]
 
-    # expensive products
-    if wants_expensive:
-
+    if wants_best_rating:
         filtered_products.sort(
-            key=lambda p: float(
-                getattr(p, "price", 0) or 0
-            ),
+            key=lambda p: float(getattr(p, "rating", 0) or 0),
             reverse=True
         )
-
+        session["last_product_ids"] = [p.id for p in filtered_products[:limit]]
         return filtered_products[:limit]
 
-    # normal matching
+    if wants_explanation:
+        scored_products = []
+
+        for product in filtered_products:
+            score = score_product_match(product, prompt)
+
+            if score > 0:
+                scored_products.append((score, product))
+
+        scored_products.sort(key=lambda x: x[0], reverse=True)
+
+        result = [product for _, product in scored_products[:1]]
+        session["last_product_ids"] = [p.id for p in result]
+        return result
+
     scored_products = []
 
     for product in filtered_products:
-
-        score = score_product_match(
-            product,
-            prompt
-        )
+        score = score_product_match(product, prompt)
 
         if score > 0:
-            scored_products.append(
-                (score, product)
-            )
+            scored_products.append((score, product))
 
-    scored_products.sort(
-        key=lambda x: x[0],
-        reverse=True
-    )
+    scored_products.sort(key=lambda x: x[0], reverse=True)
 
-    return [
-        product
-        for _, product in scored_products[:limit]
-    ]
+    result = [product for _, product in scored_products[:limit]]
+    session["last_product_ids"] = [p.id for p in result]
+
+    return result
 
 
 def build_product_card(product):
-    """
-    Creates HTML product card for chatbot.
-    """
-
     product_link = get_product_link(product)
-
-    description = (
-        getattr(product, "description", "")
-        or "No description available."
-    )
+    description = getattr(product, "description", "") or "No description available."
 
     short_description = (
         description[:140] + "..."
@@ -370,7 +277,6 @@ def build_product_card(product):
     )
 
     rating = getattr(product, "rating", None)
-
     category = getattr(product, "category", None)
 
     return f"""
@@ -381,19 +287,13 @@ def build_product_card(product):
         background:#1e293b;
         color:white;
     ">
-
-        <strong style="font-size:16px;">
-            {product.name}
-        </strong>
+        <strong style="font-size:16px;">{product.name}</strong>
 
         <br><br>
 
         💲 Price: ${float(product.price):.2f}<br>
-
         📦 Category: {category or 'General'}<br>
-
         ⭐ Rating: {rating or 'N/A'}<br>
-
         📍 Stock: {get_stock_status(product)}<br><br>
 
         <div style="line-height:1.5;">
@@ -406,142 +306,109 @@ def build_product_card(product):
             href="{product_link}"
             target="_blank"
             rel="noopener noreferrer"
-            style="
-                color:#7dd3fc;
-                font-weight:bold;
-                text-decoration:underline;
-            "
+            style="color:#7dd3fc; font-weight:bold; text-decoration:underline;"
         >
             View Product
         </a>
-
     </div>
     """
 
 
 def build_multiple_products_response(products):
-    """
-    Builds final chatbot recommendation HTML.
-    """
-
     response = """
     <div style="line-height:1.6;">
-        <strong>
-            Recommended Products:
-        </strong>
+        <strong>Recommended Products:</strong>
         <br><br>
     """
 
     for product in products:
-
-        response += build_product_card(
-            product
-        )
+        response += build_product_card(product)
 
     response += "</div>"
 
     return response
 
 
-@chat_bp.route("/ask", methods=["POST"])
-def generate():
-    """
-    Main chatbot endpoint.
-    """
-
-    data = request.get_json(
-        silent=True
-    ) or {}
-
-    prompt = (
-        data.get("prompt") or ""
-    ).strip()
-
-    if not prompt:
-
-        return jsonify({
-            "error": "Missing 'prompt'"
-        }), 400
-
-    # =====================================
-    # Sync DummyJSON into DB
-    # =====================================
-
+def build_ai_response(prompt):
     try:
+        completion = client.chat.completions.create(
+            model=GROQ_MODEL,
+            messages=[
+                {
+                    "role": "system",
+                    "content": """
+You are NorthStar Assistant, a friendly ecommerce chatbot.
 
-        fetchApiProducts()
-
-        print(
-            "DummyJSON products synced successfully."
+Rules:
+- Reply naturally to greetings and general conversation.
+- Keep replies short.
+- Do not recommend products unless the user asks about products.
+- Do not invent fake products or fake links.
+"""
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            temperature=0.7,
+            max_completion_tokens=200,
         )
+
+        ai_text = completion.choices[0].message.content.strip()
+
+        return f"""
+        <div style='line-height:1.6;'>
+            {ai_text}
+        </div>
+        """
 
     except Exception as e:
+        print("AI fallback error:", e)
 
-        print(
-            "Product sync failed:",
-            e
-        )
+        return """
+        <div style='line-height:1.6;'>
+            Hi! I can help you find products, compare prices, or answer store questions.
+        </div>
+        """
 
-    # =====================================
-    # Find matching products
-    # =====================================
 
-    matched_products = find_matching_products(
-        prompt
-    )
+@chat_bp.route("/ask", methods=["POST"])
+def generate():
+    data = request.get_json(silent=True) or {}
+    prompt = (data.get("prompt") or "").strip()
 
-    # =====================================
-    # Database products found
-    # =====================================
+    if not prompt:
+        return jsonify({"error": "Missing 'prompt'"}), 400
 
-    if matched_products:
-
-        output = (
-            build_multiple_products_response(
-                matched_products
-            )
-        )
-
+    if not is_product_query(prompt):
         return jsonify({
-
-            "output": output,
-
-            "source": "database",
-
-            "products": [
-                product.to_dict()
-                for product in matched_products
-            ]
+            "output": build_ai_response(prompt),
+            "source": "ai",
+            "products": []
         })
 
-    # =====================================
-    # No products found
-    # =====================================
+    try:
+        fetchApiProducts()
+        print("DummyJSON products synced successfully.")
+    except Exception as e:
+        print("Product sync failed:", e)
+
+    session.pop("not_found_message", None)
+
+    matched_products = find_matching_products(prompt)
+
+    if matched_products:
+        return jsonify({
+            "output": build_multiple_products_response(matched_products),
+            "source": "database",
+            "products": [product.to_dict() for product in matched_products]
+        })
+
+    not_found_message = session.pop("not_found_message", None)
 
     return jsonify({
-
-        "output": """
-        <div style='line-height:1.6;'>
-
-            <strong>
-                No matching products found.
-            </strong>
-
-            <br><br>
-
-            Try searching for:
-            <ul>
-                <li>Laptops</li>
-                <li>Smartphones</li>
-                <li>Beauty products</li>
-                <li>Furniture</li>
-                <li>Groceries</li>
-            </ul>
-
-        </div>
-        """,
-
+        "output": build_not_found_response(not_found_message),
         "source": "database",
-
         "products": []
     })

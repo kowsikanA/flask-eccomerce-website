@@ -5,6 +5,7 @@ from models import CartItem, Product, User
 
 carts_bp = Blueprint("cart", __name__, url_prefix="/api")
 
+# all the CRUD routes requrire the user authentication using JWTAuth
 
 # GET /api/cart  – list current user's cart
 @carts_bp.route("/cart", methods=["GET"])

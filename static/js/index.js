@@ -214,15 +214,17 @@ document.addEventListener("DOMContentLoaded", updateAuthUI);
     };
 
     // ✅ FIXED: View Details routing
-    document.getElementById("modal-view-details").onclick = () => {
-      if (!selectedProduct) return;
+document.getElementById("modal-view-details").onclick = () => {
 
-      // store product for next page
-      localStorage.setItem("selectedProductId", selectedProduct.id);
+  if (!selectedProduct) return;
 
-      // redirect
-      window.location.href = "/productDetails";
-    };
+  // Redirect using URL parameter
+  // Example:
+  // /productDetails?id=15
+
+  window.location.href =
+    `/productDetails?id=${selectedProduct.id}`;
+};
 
     document.getElementById("modal-add-to-cart").onclick = async () => {
       if (!selectedProduct) return;

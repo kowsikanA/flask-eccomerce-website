@@ -254,6 +254,19 @@ document.addEventListener("DOMContentLoaded", updateAuthUI);
             </article>
           `;
         }).join("");
+document.querySelectorAll(".quick-view-btn")
+  .forEach(button => {
+
+    button.addEventListener("click", () => {
+
+      const productId =
+        button.dataset.id;
+
+      // Redirect using URL parameter
+      window.location.href =
+        `/productDetails?id=${productId}`;
+    });
+  });
 
         loadMoreBtn.style.display =
           visibleCount >= currentProducts.length ? "none" : "inline-flex";

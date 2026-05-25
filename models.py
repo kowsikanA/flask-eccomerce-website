@@ -72,51 +72,100 @@ class Product(db.Model):
     # Product name shown in the frontend
     name = db.Column(db.String(100), nullable=False)
 
+    # Product category
+    category = db.Column(db.String(100), nullable=True)
+
+    # Product brand
+    brand = db.Column(db.String(100), nullable=True)
+
+    # Product rating
+    rating = db.Column(db.Float, nullable=True)
+
     # Price stored as a numeric type, cannot be negative
     price = db.Column(
         db.Numeric(10, 2),
-        db.CheckConstraint("price >= 0", name="check_product_price_positive"),
+        db.CheckConstraint(
+            "price >= 0",
+            name="check_product_price_positive"
+        ),
         nullable=False,
         default=1,
     )
 
     # Optional URL for the product image used on the frontend
-    image_url = db.Column(db.String(500), nullable=True)
+    image_url = db.Column(
+        db.String(500),
+        nullable=True
+    )
 
-    # Amount of stock, can't be negative
+    # Amount of stock
     inventory = db.Column(
         db.Integer,
-        db.CheckConstraint("inventory >= 0", name="check_product_inventory_positive"),
+        db.CheckConstraint(
+            "inventory >= 0",
+            name="check_product_inventory_positive"
+        ),
         default=0,
         nullable=False,
     )
 
-    # Controls whether product is actually available or not
-    available = db.Column(db.Boolean, default=True, nullable=False)
+    # Controls whether product is available
+    available = db.Column(
+        db.Boolean,
+        default=True,
+        nullable=False
+    )
 
-    # Text description of product
-    description = db.Column(db.String(1000), nullable=True)
+    # Product description
+    description = db.Column(
+        db.String(1000),
+        nullable=True
+    )
 
-    # Time when product was created
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    # Time created
+    created_at = db.Column(
+        db.DateTime,
+        default=datetime.utcnow
+    )
 
-    # All cart items which reference this product
-    cart_items = db.relationship("CartItem", back_populates="product")
+    # Relationships
+    cart_items = db.relationship(
+        "CartItem",
+        back_populates="product"
+    )
 
-    # All order items that reference this product
-    order_items = db.relationship("OrderItem", back_populates="product")
+    order_items = db.relationship(
+        "OrderItem",
+        back_populates="product"
+    )
 
-    # Helper method to convert into dict
+    # Convert product to dictionary
     def to_dict(self) -> dict:
         return {
             "id": self.id,
             "name": self.name,
+
+            "category": self.category,
+
+            "brand": self.brand,
+
+            "rating": self.rating,
+
             "price": float(self.price),
+
             "image_url": self.image_url,
+
             "inventory": self.inventory,
+
             "available": self.available,
+
             "description": self.description,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
+
+            "created_at": (
+                self.created_at.isoformat()
+                if self.created_at
+                else None
+            ),
         }
 
 

@@ -9,7 +9,7 @@ function getUserData(token) {
     const email = payload.sub || payload.identity || "";
     return {
       email,
-      initial: email.charAt(0).toUpperCase() || "U"
+      initial: email.charAt(0).toUpperCase() || "U",
     };
   } catch {
     return { email: "User", initial: "U" };
@@ -24,8 +24,9 @@ function getAvatarColor(letter) {
     "#F97316",
     "#9333EA",
     "#DC2626",
-    "#0284C7"
+    "#0284C7",
   ];
+
   return colors[letter.charCodeAt(0) % colors.length];
 }
 
@@ -34,6 +35,8 @@ function updateAuthUI() {
   const dropdown = document.getElementById("user-dropdown");
   const dropdownAvatar = document.getElementById("dropdown-avatar");
   const dropdownEmail = document.getElementById("dropdown-email");
+
+  if (!authLink || !dropdown) return;
 
   const token = localStorage.getItem("access_token");
 
@@ -47,39 +50,35 @@ function updateAuthUI() {
 
   const user = getUserData(token);
 
-  // avatar circle
   authLink.textContent = user.initial;
   authLink.href = "#";
   authLink.classList.add("user-avatar");
   authLink.style.backgroundColor = getAvatarColor(user.initial);
 
-  // dropdown info
-  dropdownAvatar.textContent = user.initial;
-  dropdownAvatar.style.backgroundColor = getAvatarColor(user.initial);
-  dropdownEmail.textContent = user.email;
+  if (dropdownAvatar) {
+    dropdownAvatar.textContent = user.initial;
+    dropdownAvatar.style.backgroundColor = getAvatarColor(user.initial);
+  }
 
-  // toggle dropdown
+  if (dropdownEmail) {
+    dropdownEmail.textContent = user.email;
+  }
+
   authLink.onclick = (e) => {
     e.preventDefault();
     dropdown.classList.toggle("hidden");
   };
 }
 
-// logout click
 document.addEventListener("click", (e) => {
   if (e.target.id === "logout-btn") {
     handleLogout();
   }
-});
 
-document.addEventListener("click", (e) => {
   if (e.target.id === "account-btn") {
     window.location.href = "/account";
   }
-});
 
-// click outside closes dropdown
-document.addEventListener("click", (e) => {
   const dropdown = document.getElementById("user-dropdown");
   const authLink = document.getElementById("auth-link");
 
@@ -93,130 +92,171 @@ document.addEventListener("click", (e) => {
 document.addEventListener("DOMContentLoaded", updateAuthUI);
 
 const accordian = document.getElementsByClassName("accordion");
-  let i;
 
-  for (i = 0; i < accordian.length; i++) {
-    accordian[i].addEventListener("click", function () {
-      this.classList.toggle("active");
-      const panel = this.nextElementSibling;
-      if (panel.style.display === "block") {
-        panel.style.display = "none";
-      } else {
-        panel.style.display = "block";
-      }
-    });
+for (let i = 0; i < accordian.length; i++) {
+  accordian[i].addEventListener("click", function () {
+    this.classList.toggle("active");
+
+    const panel = this.nextElementSibling;
+
+    panel.style.display = panel.style.display === "block" ? "none" : "block";
+  });
+}
+
+let currentProduct = null;
+
+const largeImage = document.querySelector(".largeImage");
+const imageGallery = document.querySelector(".imageGallery");
+
+function getProductIdFromUrl() {
+
+  // Read the product ID from URL
+  // Example:
+  // /productDetails?id=122
+
+  const params = new URLSearchParams(window.location.search);
+
+  const productId = params.get("id");
+
+  // No localStorage fallback anymore
+  // This prevents old/wrong products loading
+
+  if (!productId) {
+    console.error("No product ID found in URL");
+    return null;
   }
 
-   async function fetchRelatedProducts(tag) {
-    const container = document.querySelector(".related-products .products");
-    container.innerHTML = "";
+  return productId;
+}
 
-    if (!tag) return;
+async function fetchRelatedProducts(tag) {
+  const container = document.querySelector(".related-products .products");
 
-    try {
-      const res = await fetch(
-        `https://dummyjson.com/products/category/${encodeURIComponent(tag)}`
-      );
+  if (!container) return;
 
-      if (!res.ok) {
-        throw new Error(`Status ${res.status}`);
-      }
+  container.innerHTML = "";
 
-      const data = await res.json();
-      const products = data.products || [];
+  if (!tag) return;
 
-      if (products.length === 0) {
-        container.innerHTML = "<p>No related products found.</p>";
-        return;
-      }
+  try {
+    const res = await fetch(
+      `https://dummyjson.com/products/category/${encodeURIComponent(tag)}`
+    );
 
-      const firstFourProducts = products.slice(0, 4);
-
-      firstFourProducts.forEach((prod) => {
-        const card = document.createElement("div");
-        card.className = "related-product-card";
-
-        card.innerHTML = `
-          <img src="${prod.thumbnail}" alt="${prod.title}" class="related-product-img" />
-          <h4 class="related-product-title">${prod.title}</h4>
-          <p class="related-product-price">$${prod.price}</p>
-        `;
-
-        card.addEventListener("click", () => {
-          localStorage.setItem("selectedProductId", prod.id);
-          window.location.href = "/productDetails";
-        });
-
-        container.appendChild(card);
-      });
-
-      if (products.length > 4) {
-        const buttonWrapper = document.createElement("div");
-        buttonWrapper.className = "view-more-wrapper";
-
-        buttonWrapper.innerHTML = `
-          <a href="/search?query=${encodeURIComponent(tag)}" class="view-more-btn">
-            View More Products
-          </a>
-        `;
-
-        document.querySelector(".related-products").appendChild(buttonWrapper);
-      }
-    } catch (err) {
-      console.error(err);
-      container.innerHTML = "<p>Failed to load related products.</p>";
+    if (!res.ok) {
+      throw new Error(`Status ${res.status}`);
     }
-  }
- let currentProduct = null;
-  const largeImage = document.querySelector(".largeImage");
-  const imageGallery = document.querySelector(".imageGallery");
 
-  async function getData() {
-    const productId = localStorage.getItem("selectedProductId");
-    if (!productId) {
-      console.error("No product ID found in localStorage");
+    const data = await res.json();
+    const products = data.products || [];
+
+    if (products.length === 0) {
+      container.innerHTML = "<p>No related products found.</p>";
       return;
     }
 
-    const url = `https://dummyjson.com/products/${productId}`;
+    const firstFourProducts = products.slice(0, 4);
 
-    try {
-      const res = await fetch(url);
-      if (!res.ok) {
-        throw new Error(`Response status ${res.status}`);
-      }
+    firstFourProducts.forEach((prod) => {
+      const card = document.createElement("div");
+      card.className = "related-product-card";
 
-      currentProduct = await res.json();
+      card.innerHTML = `
+        <img src="${prod.thumbnail}" alt="${prod.title}" class="related-product-img" />
+        <h4 class="related-product-title">${prod.title}</h4>
+        <p class="related-product-price">$${prod.price}</p>
+      `;
 
+      card.addEventListener("click", () => {
+        window.location.href = `/productDetails?id=${prod.id}`;
+      });
+
+      container.appendChild(card);
+    });
+
+    const existingBtn = document.querySelector(".view-more-wrapper");
+    if (existingBtn) existingBtn.remove();
+
+    if (products.length > 4) {
+      const buttonWrapper = document.createElement("div");
+      buttonWrapper.className = "view-more-wrapper";
+
+      buttonWrapper.innerHTML = `
+        <a href="/search?query=${encodeURIComponent(tag)}" class="view-more-btn">
+          View More Products
+        </a>
+      `;
+
+      document.querySelector(".related-products")?.appendChild(buttonWrapper);
+    }
+  } catch (err) {
+    console.error(err);
+    container.innerHTML = "<p>Failed to load related products.</p>";
+  }
+}
+
+async function getData() {
+  const productId = getProductIdFromUrl();
+
+  if (!productId) {
+    console.error("No product ID found in URL or localStorage");
+    return;
+  }
+
+  const url = `https://dummyjson.com/products/${productId}`;
+
+  try {
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error(`Response status ${res.status}`);
+    }
+
+    currentProduct = await res.json();
+
+    if (largeImage) {
       const mainImg = document.createElement("img");
       mainImg.className = "main-img";
       mainImg.src = currentProduct.thumbnail;
+
       largeImage.innerHTML = "";
       largeImage.append(mainImg);
 
-      const imagesArray = currentProduct.images;
-      imagesArray.forEach((smallImage) => {
-        const viewImg = document.createElement("img");
-        viewImg.src = smallImage;
-        viewImg.className = "viewImg";
-        imageGallery.append(viewImg);
+      if (imageGallery) {
+        imageGallery.innerHTML = "";
 
-        viewImg.onclick = function () {
-          mainImg.src = viewImg.src;
-        };
-      });
+        const imagesArray = currentProduct.images || [];
 
-      document.querySelector(".product-title").textContent = currentProduct.title;
-      document.querySelector(".product-cost").textContent = `$${currentProduct.price}`;
-      document.querySelector(".product-brand").textContent = `Brand: ${currentProduct.brand}`;
-      document.querySelector(".description").textContent = currentProduct.description;
+        imagesArray.forEach((smallImage) => {
+          const viewImg = document.createElement("img");
+          viewImg.src = smallImage;
+          viewImg.className = "viewImg";
 
-      const starContainer = document.querySelector(".star-rating");
-      const ratingValue = currentProduct.rating;
+          imageGallery.append(viewImg);
 
+          viewImg.onclick = function () {
+            mainImg.src = viewImg.src;
+          };
+        });
+      }
+    }
+
+    document.querySelector(".product-title").textContent = currentProduct.title;
+    document.querySelector(".product-cost").textContent = `$${currentProduct.price}`;
+    document.querySelector(".product-brand").textContent = `Brand: ${
+      currentProduct.brand || "N/A"
+    }`;
+    document.querySelector(".description").textContent =
+      currentProduct.description || "No description available.";
+
+    const starContainer = document.querySelector(".star-rating");
+    const ratingValue = Number(currentProduct.rating || 0);
+
+    if (starContainer) {
       starContainer.innerHTML = "";
 
       const starsDiv = generateStars(ratingValue);
+
       while (starsDiv.firstChild) {
         starContainer.appendChild(starsDiv.firstChild);
       }
@@ -224,28 +264,39 @@ const accordian = document.getElementsByClassName("accordion");
       const ratingText = document.createElement("span");
       ratingText.textContent = `${ratingValue.toFixed(1)} / 5`;
       starContainer.appendChild(ratingText);
+    }
 
-      const availabilityStatus = document.querySelector(".availability");
+    const availabilityStatus = document.querySelector(".availability");
+
+    if (availabilityStatus) {
       const statusValue = currentProduct.availabilityStatus
         ? currentProduct.availabilityStatus.trim()
         : "Unknown";
 
       availabilityStatus.innerHTML = `Availability Status: <span>${statusValue}</span>`;
+
       const span = availabilityStatus.querySelector("span");
       span.style.fontWeight = "bold";
 
       const statusLower = statusValue.toLowerCase();
+
       if (statusLower === "low stock") {
         span.style.color = "orange";
-      } else if (statusLower === "out of stock" || statusLower === "unavailable") {
+      } else if (
+        statusLower === "out of stock" ||
+        statusLower === "unavailable"
+      ) {
         span.style.color = "red";
       } else if (statusLower === "in stock" || statusLower === "available") {
         span.style.color = "green";
       } else {
         span.style.color = "gray";
       }
+    }
 
-      const specsTable = document.querySelector(".product-specs table");
+    const specsTable = document.querySelector(".product-specs table");
+
+    if (specsTable) {
       const possibleSources = [
         currentProduct.category,
         currentProduct.dimensions,
@@ -255,6 +306,7 @@ const accordian = document.getElementsByClassName("accordion");
       ];
 
       let mergedEntries = [];
+
       possibleSources.forEach((source) => {
         if (!source) return;
 
@@ -293,47 +345,59 @@ const accordian = document.getElementsByClassName("accordion");
           specsTable.appendChild(tr);
         });
       }
-
-      if (currentProduct && currentProduct.category) {
-        fetchRelatedProducts(currentProduct.category);
-      }
-    } catch (error) {
-      console.error(error.message);
     }
+
+    if (currentProduct.category) {
+      fetchRelatedProducts(currentProduct.category);
+    }
+  } catch (error) {
+    console.error(error.message);
   }
+}
 
-  getData();
+getData();
 
-  const addQ = document.querySelector(".add-q");
-  const quantityDisplay = document.querySelector(".quantity");
-  const subtractQ = document.querySelector(".subtract-q");
+const addQ = document.querySelector(".add-q");
+const quantityDisplay = document.querySelector(".quantity");
+const subtractQ = document.querySelector(".subtract-q");
 
-  let quantity = 1;
+let quantity = 1;
+
+if (quantityDisplay) {
   quantityDisplay.textContent = quantity;
+}
 
+if (addQ) {
   addQ.addEventListener("click", () => {
     quantity++;
     quantityDisplay.textContent = quantity;
   });
+}
 
+if (subtractQ) {
   subtractQ.addEventListener("click", () => {
     if (quantity > 1) {
       quantity--;
       quantityDisplay.textContent = quantity;
     }
   });
+}
 
-  const modalAddToCartBtn = document.querySelector(".cart-btn");
+const modalAddToCartBtn = document.querySelector(".cart-btn");
 
+if (modalAddToCartBtn) {
   modalAddToCartBtn.addEventListener("click", async () => {
     if (!currentProduct) return;
 
     const token = localStorage.getItem("access_token");
+
     if (!token) {
       showNotification("Please sign in before adding items to your cart.", "error");
+
       setTimeout(() => {
         window.location.href = "/login";
       }, 2000);
+
       return;
     }
 
@@ -342,7 +406,7 @@ const accordian = document.getElementsByClassName("accordion");
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           product_id: currentProduct.id,
@@ -371,91 +435,105 @@ const accordian = document.getElementsByClassName("accordion");
       );
     }
   });
+}
 
-   function generateStars(rating) {
-    const starDiv = document.createElement("div");
-    starDiv.className = "star-rating";
+function generateStars(rating) {
+  const starDiv = document.createElement("div");
+  starDiv.className = "star-rating";
 
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 >= 0.5;
-    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+  const safeRating = Number(rating || 0);
+  const fullStars = Math.floor(safeRating);
+  const hasHalfStar = safeRating % 1 >= 0.5;
+  const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
 
-    for (let i = 0; i < fullStars; i++) {
-      const star = document.createElement("i");
-      star.className = "fa fa-star";
-      starDiv.appendChild(star);
-    }
-
-    if (hasHalfStar) {
-      const halfStar = document.createElement("i");
-      halfStar.className = "fa fa-star-half-o";
-      starDiv.appendChild(halfStar);
-    }
-
-    for (let i = 0; i < emptyStars; i++) {
-      const star = document.createElement("i");
-      star.className = "fa fa-star-o";
-      starDiv.appendChild(star);
-    }
-
-    return starDiv;
+  for (let i = 0; i < fullStars; i++) {
+    const star = document.createElement("i");
+    star.className = "fa fa-star";
+    starDiv.appendChild(star);
   }
 
-  async function fetchReviews() {
-    const productId = localStorage.getItem("selectedProductId");
-    if (!productId) return;
+  if (hasHalfStar) {
+    const halfStar = document.createElement("i");
+    halfStar.className = "fa fa-star-half-o";
+    starDiv.appendChild(halfStar);
+  }
 
-    const url = `https://dummyjson.com/products/${productId}`;
+  for (let i = 0; i < emptyStars; i++) {
+    const star = document.createElement("i");
+    star.className = "fa fa-star-o";
+    starDiv.appendChild(star);
+  }
 
-    try {
-      const res = await fetch(url);
-      if (!res.ok) {
-        throw new Error(`Response status ${res.status}`);
+  return starDiv;
+}
+
+async function fetchReviews() {
+  const productId = getProductIdFromUrl();
+
+  if (!productId) return;
+
+  const url = `https://dummyjson.com/products/${productId}`;
+
+  try {
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      throw new Error(`Response status ${res.status}`);
+    }
+
+    const data = await res.json();
+    const apiReviews = data.reviews || [];
+
+    const savedReviews =
+      JSON.parse(localStorage.getItem(`reviews_${productId}`)) || [];
+
+    const reviews = [...apiReviews, ...savedReviews];
+
+    const ratingContainer = document.getElementById("reviews-container");
+
+    if (!ratingContainer) return;
+
+    ratingContainer.innerHTML = "";
+
+    if (reviews.length === 0) {
+      ratingContainer.innerHTML = `<p>No reviews available for this product</p>`;
+      return;
+    }
+
+    const averageRating =
+      reviews.reduce((sum, review) => sum + Number(review.rating), 0) /
+      reviews.length;
+
+    const overallRatingNumber = document.getElementById("overall-rating-number");
+    const totalReviewCount = document.getElementById("total-review-count");
+
+    if (overallRatingNumber) {
+      overallRatingNumber.textContent = averageRating.toFixed(1);
+    }
+
+    if (totalReviewCount) {
+      totalReviewCount.textContent = `${reviews.length} Reviews`;
+    }
+
+    const overallStars = document.querySelector(".overall-rating-stars");
+
+    if (overallStars) {
+      overallStars.innerHTML = "";
+
+      const overallStarsDiv = generateStars(averageRating);
+
+      while (overallStarsDiv.firstChild) {
+        overallStars.appendChild(overallStarsDiv.firstChild);
       }
+    }
 
-      const data = await res.json();
-      const apiReviews = data.reviews || [];
+    const starContainer = document.querySelector(".star-rating");
 
-      const savedReviews =
-        JSON.parse(localStorage.getItem(`reviews_${productId}`)) || [];
-
-      const reviews = [...apiReviews, ...savedReviews];
-
-      const ratingContainer = document.getElementById("reviews-container");
-      ratingContainer.innerHTML = "";
-
-      if (reviews.length === 0) {
-        ratingContainer.innerHTML = `<p>No reviews available for this product</p>`;
-        return;
-      }
-
-      const averageRating =
-        reviews.reduce((sum, review) => sum + Number(review.rating), 0) /
-        reviews.length;
-
-      document.getElementById("overall-rating-number").textContent =
-        averageRating.toFixed(1);
-
-      document.getElementById("total-review-count").textContent =
-        `${reviews.length} Reviews`;
-
-      const overallStars = document.querySelector(".overall-rating-stars");
-
-      if (overallStars) {
-        overallStars.innerHTML = "";
-
-        const overallStarsDiv = generateStars(averageRating);
-
-        while (overallStarsDiv.firstChild) {
-          overallStars.appendChild(overallStarsDiv.firstChild);
-        }
-      }
-
-
-      const starContainer = document.querySelector(".star-rating");
+    if (starContainer) {
       starContainer.innerHTML = "";
 
       const starsDiv = generateStars(averageRating);
+
       while (starsDiv.firstChild) {
         starContainer.appendChild(starsDiv.firstChild);
       }
@@ -463,189 +541,207 @@ const accordian = document.getElementsByClassName("accordion");
       const ratingText = document.createElement("span");
       ratingText.textContent = `${averageRating.toFixed(1)} / 5`;
       starContainer.appendChild(ratingText);
-
-      reviews.forEach((review) => {
-        const customerReviewDiv = document.createElement("div");
-        customerReviewDiv.className = "rating-customer";
-
-        const iconDiv = document.createElement("div");
-        iconDiv.className = "icon-container";
-        iconDiv.innerHTML = `<i class="fa fa-user"></i>`;
-
-        const contentDiv = document.createElement("div");
-        contentDiv.className = "customer-review";
-
-        const nameEl = document.createElement("h4");
-        nameEl.textContent = review.reviewerName || "Anonymous";
-
-        const emailEl = document.createElement("p");
-        emailEl.className = "email";
-        emailEl.textContent = review.reviewerEmail || "";
-
-        const starDiv = generateStars(Number(review.rating));
-
-        const dateEl = document.createElement("p");
-        dateEl.className = "dateCreated";
-        dateEl.textContent = new Date(review.date).toLocaleDateString();
-
-        starDiv.appendChild(dateEl);
-
-        const commentEl = document.createElement("p");
-        commentEl.className = "reviewInfo";
-        commentEl.textContent = review.comment;
-
-        contentDiv.append(nameEl, emailEl, starDiv, commentEl);
-        customerReviewDiv.append(iconDiv, contentDiv);
-        ratingContainer.appendChild(customerReviewDiv);
-      });
-    } catch (err) {
-      console.error(err);
     }
+
+    reviews.forEach((review) => {
+      const customerReviewDiv = document.createElement("div");
+      customerReviewDiv.className = "rating-customer";
+
+      const iconDiv = document.createElement("div");
+      iconDiv.className = "icon-container";
+      iconDiv.innerHTML = `<i class="fa fa-user"></i>`;
+
+      const contentDiv = document.createElement("div");
+      contentDiv.className = "customer-review";
+
+      const nameEl = document.createElement("h4");
+      nameEl.textContent = review.reviewerName || "Anonymous";
+
+      const emailEl = document.createElement("p");
+      emailEl.className = "email";
+      emailEl.textContent = review.reviewerEmail || "";
+
+      const starDiv = generateStars(Number(review.rating));
+
+      const dateEl = document.createElement("p");
+      dateEl.className = "dateCreated";
+      dateEl.textContent = review.date
+        ? new Date(review.date).toLocaleDateString()
+        : "";
+
+      starDiv.appendChild(dateEl);
+
+      const commentEl = document.createElement("p");
+      commentEl.className = "reviewInfo";
+      commentEl.textContent = review.comment || "";
+
+      contentDiv.append(nameEl, emailEl, starDiv, commentEl);
+      customerReviewDiv.append(iconDiv, contentDiv);
+      ratingContainer.appendChild(customerReviewDiv);
+    });
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+document.addEventListener("click", (e) => {
+  if (e.target.id !== "submit-review-btn") return;
+
+  const productId = getProductIdFromUrl();
+
+  if (!productId) return;
+
+  const name = document.getElementById("reviewer-name").value.trim();
+  const email = document.getElementById("reviewer-email").value.trim();
+  const rating = Number(document.getElementById("review-rating").value);
+  const comment = document.getElementById("review-comment").value.trim();
+
+  if (!name || !email || !comment) {
+    showNotification("Please fill out all review fields.", "error");
+    return;
   }
 
-  document.addEventListener("click", (e) => {
-    if (e.target.id !== "submit-review-btn") return;
+  const newReview = {
+    reviewerName: name,
+    reviewerEmail: email,
+    rating,
+    comment,
+    date: new Date().toISOString(),
+  };
 
-    const productId = localStorage.getItem("selectedProductId");
-    if (!productId) return;
+  const savedReviews =
+    JSON.parse(localStorage.getItem(`reviews_${productId}`)) || [];
 
-    const name = document.getElementById("reviewer-name").value.trim();
-    const email = document.getElementById("reviewer-email").value.trim();
-    const rating = Number(document.getElementById("review-rating").value);
-    const comment = document.getElementById("review-comment").value.trim();
+  savedReviews.push(newReview);
 
-    if (!name || !email || !comment) {
-      showNotification("Please fill out all review fields.", "error");
-      return;
-    }
+  localStorage.setItem(`reviews_${productId}`, JSON.stringify(savedReviews));
 
-    const newReview = {
-      reviewerName: name,
-      reviewerEmail: email,
-      rating,
-      comment,
-      date: new Date().toISOString(),
-    };
+  document.getElementById("reviewer-name").value = "";
+  document.getElementById("reviewer-email").value = "";
+  document.getElementById("review-rating").value = "5";
+  document.getElementById("review-comment").value = "";
 
-    const savedReviews =
-      JSON.parse(localStorage.getItem(`reviews_${productId}`)) || [];
+  showNotification("Review added successfully.", "success");
 
-    savedReviews.push(newReview);
+  fetchReviews();
+});
 
-    localStorage.setItem(`reviews_${productId}`, JSON.stringify(savedReviews));
-
-    document.getElementById("reviewer-name").value = "";
-    document.getElementById("reviewer-email").value = "";
-    document.getElementById("review-rating").value = "5";
-    document.getElementById("review-comment").value = "";
-
-    showNotification("Review added successfully.", "success");
-    fetchReviews();
-  });
-
-  
 document.addEventListener("click", (e) => {
-
   if (e.target.id === "open-review-btn") {
-    document
-      .getElementById("add-review-box")
-      .classList.remove("hidden");
+    document.getElementById("add-review-box")?.classList.remove("hidden");
   }
 
   if (e.target.id === "cancel-review-btn") {
-    document
-      .getElementById("add-review-box")
-      .classList.add("hidden");
+    document.getElementById("add-review-box")?.classList.add("hidden");
   }
-
 });
-
 
 document.addEventListener("DOMContentLoaded", fetchReviews);
 
-  const notificationEl = document.getElementById("notification");
-  let notificationTimeout;
+const notificationEl = document.getElementById("notification");
+let notificationTimeout;
 
-  function showNotification(message, type = "success", duration = 3000) {
-    if (!notificationEl) return;
+function showNotification(message, type = "success", duration = 3000) {
+  if (!notificationEl) return;
 
-    notificationEl.className = "notification";
-    notificationEl.textContent = message;
+  notificationEl.className = "notification";
+  notificationEl.textContent = message;
 
-    if (type === "success") {
-      notificationEl.classList.add("notification-success");
-    } else if (type === "error") {
-      notificationEl.classList.add("notification-error");
-    }
-
-    notificationEl.classList.add("show");
-
-    if (notificationTimeout) {
-      clearTimeout(notificationTimeout);
-    }
-    notificationTimeout = setTimeout(() => {
-      notificationEl.classList.remove("show");
-    }, duration);
+  if (type === "success") {
+    notificationEl.classList.add("notification-success");
+  } else if (type === "error") {
+    notificationEl.classList.add("notification-error");
   }
 
-  notificationEl?.addEventListener("click", () => {
+  notificationEl.classList.add("show");
+
+  if (notificationTimeout) {
+    clearTimeout(notificationTimeout);
+  }
+
+  notificationTimeout = setTimeout(() => {
     notificationEl.classList.remove("show");
-  });
-  const chatWidget = document.getElementById("chat-widget");
-  const chatToggle = document.getElementById("chat-toggle");
-  const chatBody = document.getElementById("chat-body");
-  const chatInput = document.getElementById("chat-input");
-  const chatSend = document.getElementById("chat-send");
+  }, duration);
+}
 
-  function appendMessage(role, text) {
-    const msg = document.createElement("div");
-    msg.className = "chat-message " + role;
+notificationEl?.addEventListener("click", () => {
+  notificationEl.classList.remove("show");
+});
+
+const chatWidget = document.getElementById("chat-widget");
+const chatToggle = document.getElementById("chat-toggle");
+const chatBody = document.getElementById("chat-body");
+const chatInput = document.getElementById("chat-input");
+const chatSend = document.getElementById("chat-send");
+
+function appendMessage(role, text) {
+  const msg = document.createElement("div");
+
+  msg.className = "chat-message " + role;
+
+  if (role === "user") {
     msg.textContent = text;
-    chatBody.appendChild(msg);
-    chatBody.scrollTop = chatBody.scrollHeight;
-    return msg;
+  } else {
+    msg.innerHTML = text;
   }
 
-  async function sendChat() {
-    const text = (chatInput.value || "").trim();
-    if (!text) return;
+  chatBody.appendChild(msg);
 
-    appendMessage("user", text);
-    chatInput.value = "";
+  chatBody.scrollTop = chatBody.scrollHeight;
 
-    const thinkingEl = appendMessage("bot", "Thinking...");
+  return msg;
+}
 
-    try {
-      const resp = await fetch("/ai/ask", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ prompt: text }),
-      });
+async function sendChat() {
+  const text = (chatInput.value || "").trim();
 
-      if (!resp.ok) {
-        thinkingEl.textContent = "Error: " + resp.status;
-        return;
-      }
+  if (!text) return;
 
-      const data = await resp.json();
-      thinkingEl.textContent = data.output || "(No response from model.)";
-    } catch (err) {
-      console.error(err);
-      thinkingEl.textContent = "Network error. Please try again.";
+  appendMessage("user", text);
+
+  chatInput.value = "";
+
+  const thinkingEl = appendMessage("bot", "Thinking...");
+
+  try {
+    const resp = await fetch("/ai/ask", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ prompt: text }),
+    });
+
+    if (!resp.ok) {
+      thinkingEl.textContent = "Error: " + resp.status;
+      return;
     }
-  }
 
+    const data = await resp.json();
+
+    thinkingEl.innerHTML = data.output || "(No response from model.)";
+  } catch (err) {
+    console.error(err);
+
+    thinkingEl.textContent = "Network error. Please try again.";
+  }
+}
+
+if (chatToggle && chatWidget) {
   chatToggle.addEventListener("click", () => {
     chatWidget.classList.toggle("open");
   });
+}
 
+if (chatSend) {
   chatSend.addEventListener("click", sendChat);
+}
 
+if (chatInput) {
   chatInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
       sendChat();
     }
   });
+}

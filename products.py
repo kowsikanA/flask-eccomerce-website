@@ -13,7 +13,7 @@ def fetchApiProducts():
     If a product exists, update fields; otherwise, create it.
     """
     try:
-        res = requests.get("https://dummyjson.com/products?limit=0")
+        res = requests.get("https://dummyjson.com/products?limit=0", timeout=20)
         res.raise_for_status()
         data = res.json()
     except Exception as e:
@@ -25,29 +25,48 @@ def fetchApiProducts():
     for p in products:
         name = p.get("title")
         price = p.get("price", 0)
-        image_url = p.get("thumbnail", None)
+        image_url = p.get("thumbnail")
         description = p.get("description", "")
         stock = p.get("stock", 0)
+        category = p.get("category")
+        rating = p.get("rating")
 
         exists = Product.query.filter_by(name=name).first()
+
         if exists:
             exists.price = price
             exists.image_url = image_url
             exists.description = description
-            exists.available = True
+            exists.available = stock > 0
             exists.inventory = stock
+
+            if hasattr(exists, "category"):
+                exists.category = category
+
+            if hasattr(exists, "rating"):
+                exists.rating = rating
+
         else:
             new_product = Product(
                 name=name,
                 price=price,
                 image_url=image_url,
                 description=description,
-                available=True,
+                available=stock > 0,
                 inventory=stock,
             )
+
+            if hasattr(new_product, "category"):
+                new_product.category = category
+
+            if hasattr(new_product, "rating"):
+                new_product.rating = rating
+
             db.session.add(new_product)
 
     db.session.commit()
+
+    print(f"Synced {len(products)} products from DummyJSON.")
 
 
 # GET /api/products  (list products)

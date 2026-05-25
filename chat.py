@@ -1,236 +1,7 @@
-# from flask import Blueprint, request, jsonify
-# import os
-# import requests
-# import json
-
-# chat_bp = Blueprint("chat", __name__)
-
-# # Ollama configuration
-# OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
-# OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:1b")
-
-
-# @chat_bp.route("/ask", methods=["POST"])
-# def generate():
-#     """Forward a prompt to the local Ollama model and return the generated text."""
-#     data = request.get_json(silent=True) or {}
-#     prompt = (data.get("prompt") or "").strip()
-
-#     if not prompt:
-#         return jsonify({"error": "Missing 'prompt'"}), 400
-
-#     payload = {
-#         "model": OLLAMA_MODEL,
-#         "prompt": prompt,
-#     }
-
-#     try:
-#         resp = requests.post(
-#             OLLAMA_URL,
-#             json=payload,
-#             stream=True,
-#             timeout=300,
-#         )
-#         resp.raise_for_status()
-#     except requests.RequestException as e:
-#         return jsonify({"error": f"Ollama request failed: {e}"}), 500
-
-#     chunks = []
-#     for line in resp.iter_lines():
-#         if not line:
-#             continue
-#         try:
-#             chunk = json.loads(line.decode("utf-8"))
-#             piece = chunk.get("response", "")
-#             if piece:
-#                 chunks.append(piece)
-#         except Exception:
-#             # Ignore malformed lines and continue streaming
-#             continue
-
-#     output = "".join(chunks).strip()
-#     return jsonify({"output": output})
-
-# from flask import Blueprint, request, jsonify
-# from groq import Groq
-# import os
-# from dotenv import load_dotenv
-
-# load_dotenv()
-
-# chat_bp = Blueprint("chat", __name__)
-
-# # Pass the API key directly since you said you still want to use it here
-# client = Groq(
-#     api_key= os.getenv("GROQ_API_KEY")
-# )
-
-# GROQ_MODEL = "openai/gpt-oss-120b"
-
-
-# @chat_bp.route("/ask", methods=["POST"])
-# def generate():
-#     data = request.get_json(silent=True) or {}
-#     prompt = (data.get("prompt") or "").strip()
-
-#     if not prompt:
-#         return jsonify({"error": "Missing 'prompt'"}), 400
-
-#     try:
-#         completion = client.chat.completions.create(
-#             model=GROQ_MODEL,
-#             messages=[
-#                 {
-#                     "role": "system",
-#                     "content": "You are a helpful store assistant. Answer product questions clearly and briefly."
-#                 },
-#                 {
-#                     "role": "user",
-#                     "content": prompt
-#                 }
-#             ],
-#             temperature=1,
-#             max_completion_tokens=1024,
-#             top_p=1,
-#             reasoning_effort="medium",
-#             stream=True,
-#             stop=None
-#         )
-
-#         chunks = []
-#         for chunk in completion:
-#             if (
-#                 chunk.choices
-#                 and chunk.choices[0].delta
-#                 and chunk.choices[0].delta.content
-#             ):
-#                 chunks.append(chunk.choices[0].delta.content)
-
-#         output = "".join(chunks).strip()
-
-#         return jsonify({"output": output})
-
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-
-# from flask import Blueprint, request, jsonify
-# import os
-# import requests
-# import json
-
-# chat_bp = Blueprint("chat", __name__)
-
-# # Ollama configuration
-# OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434/api/generate")
-# OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma3:1b")
-
-
-# @chat_bp.route("/ask", methods=["POST"])
-# def generate():
-#     """Forward a prompt to the local Ollama model and return the generated text."""
-#     data = request.get_json(silent=True) or {}
-#     prompt = (data.get("prompt") or "").strip()
-
-#     if not prompt:
-#         return jsonify({"error": "Missing 'prompt'"}), 400
-
-#     payload = {
-#         "model": OLLAMA_MODEL,
-#         "prompt": prompt,
-#     }
-
-#     try:
-#         resp = requests.post(
-#             OLLAMA_URL,
-#             json=payload,
-#             stream=True,
-#             timeout=300,
-#         )
-#         resp.raise_for_status()
-#     except requests.RequestException as e:
-#         return jsonify({"error": f"Ollama request failed: {e}"}), 500
-
-#     chunks = []
-#     for line in resp.iter_lines():
-#         if not line:
-#             continue
-#         try:
-#             chunk = json.loads(line.decode("utf-8"))
-#             piece = chunk.get("response", "")
-#             if piece:
-#                 chunks.append(piece)
-#         except Exception:
-#             # Ignore malformed lines and continue streaming
-#             continue
-
-#     output = "".join(chunks).strip()
-#     return jsonify({"output": output})
-
-# from flask import Blueprint, request, jsonify
-# from groq import Groq
-# import os
-# from dotenv import load_dotenv
-
-# load_dotenv()
-
-# chat_bp = Blueprint("chat", __name__)
-
-# # Pass the API key directly since you said you still want to use it here
-# client = Groq(
-#     api_key= os.getenv("GROQ_API_KEY")
-# )
-
-# GROQ_MODEL = "openai/gpt-oss-120b"
-
-
-# @chat_bp.route("/ask", methods=["POST"])
-# def generate():
-#     data = request.get_json(silent=True) or {}
-#     prompt = (data.get("prompt") or "").strip()
-
-#     if not prompt:
-#         return jsonify({"error": "Missing 'prompt'"}), 400
-
-#     try:
-#         completion = client.chat.completions.create(
-#             model=GROQ_MODEL,
-#             messages=[
-#                 {
-#                     "role": "system",
-#                     "content": "You are a helpful store assistant. Answer product questions clearly and briefly."
-#                 },
-#                 {
-#                     "role": "user",
-#                     "content": prompt
-#                 }
-#             ],
-#             temperature=1,
-#             max_completion_tokens=1024,
-#             top_p=1,
-#             reasoning_effort="medium",
-#             stream=True,
-#             stop=None
-#         )
-
-#         chunks = []
-#         for chunk in completion:
-#             if (
-#                 chunk.choices
-#                 and chunk.choices[0].delta
-#                 and chunk.choices[0].delta.content
-#             ):
-#                 chunks.append(chunk.choices[0].delta.content)
-
-#         output = "".join(chunks).strip()
-
-#         return jsonify({"output": output})
-
-#     except Exception as e:
-#         return jsonify({"error": str(e)}), 500
-
 from flask import Blueprint, request, jsonify
 from groq import Groq
 from models import Product
+from products import fetchApiProducts
 import os
 import re
 from dotenv import load_dotenv
@@ -240,170 +11,537 @@ load_dotenv()
 chat_bp = Blueprint("chat", __name__)
 
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-
 GROQ_MODEL = "openai/gpt-oss-120b"
 
 
 def clean_words(text):
+    """
+    Cleans user text for easier keyword matching.
+    """
+
     text = (text or "").lower()
+
     text = re.sub(r"[^a-z0-9\s]", " ", text)
-    return [word for word in text.split() if len(word) > 2]
 
-
-def find_matching_product(prompt):
-    products = Product.query.all()
-
-    prompt_lower = (prompt or "").lower()
-    prompt_words = clean_words(prompt_lower)
-
-    best_match = None
-    best_score = 0
-
-    for product in products:
-        product_name = product.name or ""
-        product_description = product.description or ""
-
-        searchable_text = f"{product_name} {product_description}".lower()
-        product_words = clean_words(searchable_text)
-
-        score = 0
-
-        if product_name.lower() in prompt_lower:
-            score += 20
-
-        for word in product_words:
-            if word in prompt_words:
-                score += 3
-
-        if score > best_score:
-            best_score = score
-            best_match = product
-
-    return best_match if best_score > 0 else None
+    return [
+        word
+        for word in text.split()
+        if len(word) > 2
+    ]
 
 
 def get_product_link(product):
-    return f"http://127.0.0.1:5001/productDetails?id={product.id}"
+    """
+    Builds clickable product details URL.
+    """
+
+    return (
+        "https://flask-eccomerce-website.onrender.com/"
+        f"productDetails?id={product.id}"
+    )
 
 
 def get_stock_status(product):
+    """
+    Returns stock availability text.
+    """
+
+    stock = getattr(product, "stock", None)
+
     inventory = getattr(product, "inventory", None)
+
     available = getattr(product, "available", None)
 
-    if available is False:
-        return "Out of Stock"
+    if stock is not None:
+        return (
+            f"In Stock ({stock} available)"
+            if stock > 0
+            else "Out of Stock"
+        )
 
-    if inventory is None:
-        return "Available" if available else "Not Available"
+    if inventory is not None:
+        return (
+            f"In Stock ({inventory} available)"
+            if inventory > 0
+            else "Out of Stock"
+        )
 
-    if inventory > 0:
-        return f"In Stock ({inventory} available)"
+    if available is not None:
+        return (
+            "Available"
+            if available
+            else "Out of Stock"
+        )
 
-    return "Out of Stock"
+    return "Available"
 
 
-def build_product_details_response(product):
-    product_link = get_product_link(product)
+def product_text(product):
+    """
+    Combines searchable product text.
+    """
 
-    product_details = [
-        f"Product Name: {product.name}",
-        f"Price: ${float(product.price):.2f}",
-        f"Description: {product.description or 'No description available.'}",
-        f"Stock: {get_stock_status(product)}",
-    ]
+    return f"""
+    {getattr(product, "name", "") or ""}
+    {getattr(product, "description", "") or ""}
+    {getattr(product, "category", "") or ""}
+    {getattr(product, "brand", "") or ""}
+    """.lower()
 
-    category = getattr(product, "category", None)
-    if category:
-        product_details.append(f"Category: {category}")
 
-    specifications = getattr(product, "specifications", None)
-    if specifications:
-        product_details.append(f"Specifications: {specifications}")
+def score_product_match(product, prompt):
+    """
+    Gives products a relevance score.
+    Higher score = better match.
+    """
 
-    rating = getattr(product, "rating", None)
-    if rating:
-        product_details.append(f"Rating: {rating}")
+    prompt_lower = (prompt or "").lower()
 
-    image_url = getattr(product, "image_url", None)
-    if image_url:
-        product_details.append(f"Image: {image_url}")
+    prompt_words = clean_words(prompt_lower)
 
-    product_details.append(
-        f'Product Link: <a href="{product_link}" target="_blank" rel="noopener noreferrer">{product_link}</a>'
+    name = getattr(product, "name", "") or ""
+
+    description = getattr(product, "description", "") or ""
+
+    category = getattr(product, "category", "") or ""
+
+    brand = getattr(product, "brand", "") or ""
+
+    searchable_text = (
+        f"{name} {description} {category} {brand}"
+    ).lower()
+
+    product_words = clean_words(searchable_text)
+
+    score = 0
+
+    # exact name match
+    if name.lower() and name.lower() in prompt_lower:
+        score += 30
+
+    # category match
+    if category.lower() and category.lower() in prompt_lower:
+        score += 20
+
+    # brand match
+    if brand.lower() and brand.lower() in prompt_lower:
+        score += 15
+
+    # keyword match
+    for word in prompt_words:
+        if word in product_words:
+            score += 4
+
+    return score
+
+
+def detect_category(prompt):
+    """
+    Detects product category from user message.
+    """
+
+    prompt_lower = (prompt or "").lower()
+
+    category_map = {
+        "laptops": [
+            "laptop",
+            "laptops",
+            "computer",
+            "computers",
+            "macbook",
+        ],
+
+        "smartphones": [
+            "phone",
+            "phones",
+            "smartphone",
+            "smartphones",
+            "iphone",
+            "android",
+            "samsung",
+        ],
+
+        "beauty": [
+            "beauty",
+            "makeup",
+            "cosmetic",
+            "cosmetics",
+            "skincare",
+        ],
+
+        "fragrances": [
+            "fragrance",
+            "fragrances",
+            "perfume",
+            "cologne",
+        ],
+
+        "groceries": [
+            "grocery",
+            "groceries",
+            "food",
+            "snack",
+            "snacks",
+            "steak",
+        ],
+
+        "furniture": [
+            "furniture",
+            "chair",
+            "table",
+            "desk",
+            "sofa",
+        ],
+
+        "mens-shirts": [
+            "men",
+            "mens",
+            "shirt",
+            "shirts",
+        ],
+
+        "womens-dresses": [
+            "women",
+            "womens",
+            "dress",
+            "dresses",
+        ],
+
+        "sports-accessories": [
+            "sport",
+            "sports",
+            "fitness",
+            "ball",
+            "accessories",
+        ],
+    }
+
+    for category, keywords in category_map.items():
+
+        if any(
+            keyword in prompt_lower
+            for keyword in keywords
+        ):
+            return category
+
+    return None
+
+
+def find_matching_products(prompt, limit=3):
+    """
+    Finds matching products from database.
+    """
+
+    prompt_lower = (prompt or "").lower()
+
+    products = Product.query.all()
+
+    print("\n========== CHATBOT DATABASE DEBUG ==========")
+
+    print("User prompt:", prompt)
+
+    print("Total products in database:", len(products))
+
+    for product in products[:10]:
+
+        print({
+            "id": getattr(product, "id", None),
+            "name": getattr(product, "name", None),
+            "category": getattr(product, "category", None),
+            "price": getattr(product, "price", None),
+        })
+
+    detected_category = detect_category(prompt)
+
+    wants_cheapest = any(
+        word in prompt_lower
+        for word in [
+            "cheap",
+            "cheapest",
+            "lowest",
+            "affordable",
+            "budget",
+            "low price",
+        ]
     )
 
-    return "<br>".join(product_details)
+    wants_expensive = any(
+        word in prompt_lower
+        for word in [
+            "expensive",
+            "premium",
+            "highest price",
+        ]
+    )
+
+    filtered_products = products
+
+    # category filtering
+    if detected_category:
+
+        filtered_products = [
+            product
+            for product in products
+            if detected_category in product_text(product)
+        ]
+
+        print("Detected category:", detected_category)
+
+        print(
+            "Products after category filter:",
+            len(filtered_products)
+        )
+
+    # no products found
+    if not filtered_products and detected_category:
+
+        print(
+            "No products found for category:",
+            detected_category
+        )
+
+        return []
+
+    # cheapest products
+    if wants_cheapest:
+
+        filtered_products.sort(
+            key=lambda p: float(
+                getattr(p, "price", 0) or 0
+            )
+        )
+
+        return filtered_products[:limit]
+
+    # expensive products
+    if wants_expensive:
+
+        filtered_products.sort(
+            key=lambda p: float(
+                getattr(p, "price", 0) or 0
+            ),
+            reverse=True
+        )
+
+        return filtered_products[:limit]
+
+    # normal matching
+    scored_products = []
+
+    for product in filtered_products:
+
+        score = score_product_match(
+            product,
+            prompt
+        )
+
+        if score > 0:
+            scored_products.append(
+                (score, product)
+            )
+
+    scored_products.sort(
+        key=lambda x: x[0],
+        reverse=True
+    )
+
+    return [
+        product
+        for _, product in scored_products[:limit]
+    ]
+
+
+def build_product_card(product):
+    """
+    Creates HTML product card for chatbot.
+    """
+
+    product_link = get_product_link(product)
+
+    description = (
+        getattr(product, "description", "")
+        or "No description available."
+    )
+
+    short_description = (
+        description[:140] + "..."
+        if len(description) > 140
+        else description
+    )
+
+    rating = getattr(product, "rating", None)
+
+    category = getattr(product, "category", None)
+
+    return f"""
+    <div style="
+        margin-bottom:18px;
+        padding:14px;
+        border-radius:14px;
+        background:#1e293b;
+        color:white;
+    ">
+
+        <strong style="font-size:16px;">
+            {product.name}
+        </strong>
+
+        <br><br>
+
+        💲 Price: ${float(product.price):.2f}<br>
+
+        📦 Category: {category or 'General'}<br>
+
+        ⭐ Rating: {rating or 'N/A'}<br>
+
+        📍 Stock: {get_stock_status(product)}<br><br>
+
+        <div style="line-height:1.5;">
+            {short_description}
+        </div>
+
+        <br>
+
+        <a
+            href="{product_link}"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="
+                color:#7dd3fc;
+                font-weight:bold;
+                text-decoration:underline;
+            "
+        >
+            View Product
+        </a>
+
+    </div>
+    """
+
+
+def build_multiple_products_response(products):
+    """
+    Builds final chatbot recommendation HTML.
+    """
+
+    response = """
+    <div style="line-height:1.6;">
+        <strong>
+            Recommended Products:
+        </strong>
+        <br><br>
+    """
+
+    for product in products:
+
+        response += build_product_card(
+            product
+        )
+
+    response += "</div>"
+
+    return response
 
 
 @chat_bp.route("/ask", methods=["POST"])
 def generate():
-    data = request.get_json(silent=True) or {}
-    prompt = (data.get("prompt") or "").strip()
+    """
+    Main chatbot endpoint.
+    """
+
+    data = request.get_json(
+        silent=True
+    ) or {}
+
+    prompt = (
+        data.get("prompt") or ""
+    ).strip()
 
     if not prompt:
-        return jsonify({"error": "Missing 'prompt'"}), 400
 
-    matched_product = find_matching_product(prompt)
+        return jsonify({
+            "error": "Missing 'prompt'"
+        }), 400
 
-    # If a product is found, always return the real database product info.
-    # This prevents the AI from making fake links like store.example.com.
-    if matched_product:
-        product_link = get_product_link(matched_product)
-        output = build_product_details_response(matched_product)
-
-        return jsonify(
-            {
-                "output": output,
-                "product": matched_product.to_dict(),
-                "product_link": product_link,
-            }
-        )
+    # =====================================
+    # Sync DummyJSON into DB
+    # =====================================
 
     try:
-        completion = client.chat.completions.create(
-            model=GROQ_MODEL,
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are a helpful store assistant. "
-                        "Answer clearly and briefly. "
-                        "Do not invent product links. "
-                        "Only provide a product link if it is given by the database."
-                    ),
-                },
-                {
-                    "role": "user",
-                    "content": prompt,
-                },
-            ],
-            temperature=0.7,
-            max_completion_tokens=1024,
-            top_p=1,
-            reasoning_effort="medium",
-            stream=True,
-            stop=None,
-        )
 
-        chunks = []
+        fetchApiProducts()
 
-        for chunk in completion:
-            if (
-                chunk.choices
-                and chunk.choices[0].delta
-                and chunk.choices[0].delta.content
-            ):
-                chunks.append(chunk.choices[0].delta.content)
-
-        output = "".join(chunks).strip()
-
-        return jsonify(
-            {
-                "output": output,
-                "product": None,
-                "product_link": None,
-            }
+        print(
+            "DummyJSON products synced successfully."
         )
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+
+        print(
+            "Product sync failed:",
+            e
+        )
+
+    # =====================================
+    # Find matching products
+    # =====================================
+
+    matched_products = find_matching_products(
+        prompt
+    )
+
+    # =====================================
+    # Database products found
+    # =====================================
+
+    if matched_products:
+
+        output = (
+            build_multiple_products_response(
+                matched_products
+            )
+        )
+
+        return jsonify({
+
+            "output": output,
+
+            "source": "database",
+
+            "products": [
+                product.to_dict()
+                for product in matched_products
+            ]
+        })
+
+    # =====================================
+    # No products found
+    # =====================================
+
+    return jsonify({
+
+        "output": """
+        <div style='line-height:1.6;'>
+
+            <strong>
+                No matching products found.
+            </strong>
+
+            <br><br>
+
+            Try searching for:
+            <ul>
+                <li>Laptops</li>
+                <li>Smartphones</li>
+                <li>Beauty products</li>
+                <li>Furniture</li>
+                <li>Groceries</li>
+            </ul>
+
+        </div>
+        """,
+
+        "source": "database",
+
+        "products": []
+    })

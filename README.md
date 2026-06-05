@@ -46,7 +46,7 @@ The backend is built in **Python/Flask**, the frontend uses HTML/CSS/JS, and dat
 
 ### 🤖 Chatbot
 - Integrated AI assistant  
-- Uses **Ollama** locally via `OLLAMA_URL`  
+- Uses **Groq** for fast responses
 - Helps users browse or ask questions  
 
 ### 🗄 Database
